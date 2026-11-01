@@ -41,9 +41,10 @@ var monthNames = []string{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug"
 // ---------- settings ----------
 
 type Settings struct {
-	Root      string   `json:"root"`
-	Skins     []string `json:"skins"`
-	Overwrite bool     `json:"overwrite"`
+	Root      string    `json:"root"`
+	Skins     []string  `json:"skins"`
+	Overwrite bool      `json:"overwrite"`
+	Recolors  []Recolor `json:"recolors"`
 }
 
 var (
@@ -53,6 +54,7 @@ var (
 		// Skin1 (lightest) -> Skin6, sampled from the swatches used for Texture Comm 1
 		Skins:     []string{"#EAB892", "#CC8E69", "#A05F35", "#694028", "#564236", "#7B5B46"},
 		Overwrite: true,
+		Recolors:  defaultRecolors,
 	}
 )
 
@@ -78,6 +80,9 @@ func loadSettings() {
 			settings.Skins = s.Skins
 		}
 		settings.Overwrite = s.Overwrite
+		if s.Recolors != nil && validRecolors(s.Recolors) == nil {
+			settings.Recolors = s.Recolors
+		}
 	}
 }
 
@@ -95,6 +100,7 @@ func getSettings() Settings {
 	defer settingsMu.Unlock()
 	s := settings
 	s.Skins = append([]string(nil), settings.Skins...)
+	s.Recolors = append([]Recolor(nil), settings.Recolors...)
 	return s
 }
 
@@ -738,6 +744,13 @@ func routes() *http.ServeMux {
 			fail(w, errors.New("root folder is empty"))
 			return
 		}
+		if s.Recolors == nil {
+			s.Recolors = getSettings().Recolors
+		}
+		if err := validRecolors(s.Recolors); err != nil {
+			fail(w, err)
+			return
+		}
 		settingsMu.Lock()
 		settings = s
 		err := saveSettings()
@@ -771,6 +784,7 @@ func routes() *http.ServeMux {
 	})
 
 	addUpdateRoutes(mux)
+	addRecolorRoutes(mux)
 	return mux
 }
 

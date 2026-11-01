@@ -112,6 +112,75 @@ header{display:flex;align-items:center;gap:12px;padding:14px 22px;border-bottom:
 .btn.ghost:hover{color:#ffb4b4;border-color:#7a3535}
 .btn.danger{background:#b84a4a;border-color:#b84a4a;color:#fff;font-weight:600}
 .btn.danger:hover{filter:brightness(1.08)}
+
+.tabs{display:inline-flex;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:3px;margin-bottom:14px}
+.tab{border:0;background:transparent;color:var(--muted);padding:7px 16px;border-radius:7px;font-weight:500}
+.tab:hover{color:var(--text)}
+.tab.on{background:var(--panel2);color:var(--text);box-shadow:0 0 0 1px var(--line2)}
+.pane{display:none}
+.pane.on{display:block}
+.rc-box{margin-top:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.rc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.rc-head b{font-weight:600}
+.rc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(196px,1fr));gap:8px}
+.rc{display:flex;align-items:center;gap:10px;border:1px solid var(--line2);border-radius:9px;padding:8px 10px;cursor:pointer;user-select:none;color:var(--muted)}
+.rc:hover{border-color:#4a4a52}
+.rc.on{border-color:var(--accent);color:var(--text);background:#211b17}
+.rc input{accent-color:var(--accent);margin:0}
+.rc i{width:22px;height:22px;border-radius:6px;flex:none;border:1px solid rgba(255,255,255,.1)}
+.rc .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rc em{font-style:normal;font-size:11px;color:var(--faint)}
+.rc-opts{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:12px}
+.rc-opts .check{align-items:center}
+.rc-opts input[type=text]{width:110px;background:var(--bg);border:1px solid var(--line2);border-radius:6px;padding:3px 7px}
+.rc-rows{display:flex;flex-direction:column;gap:6px}
+.rc-row{display:grid;grid-template-columns:1fr 46px 150px 30px;gap:6px;align-items:center}
+.rc-row input[type=text],.rc-row select{background:var(--bg);border:1px solid var(--line2);border-radius:7px;padding:6px 8px;width:100%;color:var(--text)}
+.rc-row input[type=color]{width:46px;height:32px;border:1px solid var(--line2);border-radius:7px;background:none;padding:0;cursor:pointer}
+.rc-row input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+.rc-row input[type=color]::-webkit-color-swatch{border:0;border-radius:6px}
+.icon-btn{width:30px;height:30px;display:grid;place-items:center;border:1px solid var(--line2);background:transparent;border-radius:7px;color:var(--muted)}
+.icon-btn:hover{color:#ffb4b4;border-color:#7a3535}
+.dlg-b{max-height:70vh;overflow:auto}
+
+.rc-prev{margin-top:12px;background:var(--panel);border:1px solid #6b5240;border-radius:12px;padding:14px 16px;display:none}
+.rc-prev.show{display:block}
+.rc-prev-head{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.rc-prev-head b{font-weight:600}
+.rc-prev-head .file{color:var(--muted);font-size:12.5px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bg-pick{display:flex;align-items:center;gap:5px;color:var(--faint);font-size:12px}
+.bg-pick button{width:22px;height:22px;border-radius:6px;border:1px solid var(--line2);padding:0}
+.bg-pick button.on{outline:2px solid var(--accent);outline-offset:1px}
+.bg-pick .none{background-color:#5d5d63;background-image:linear-gradient(45deg,#535359 25%,transparent 25%,transparent 75%,#535359 75%),linear-gradient(45deg,#535359 25%,transparent 25%,transparent 75%,#535359 75%);background-size:8px 8px;background-position:0 0,4px 4px}
+.prev-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px}
+.prev-card{display:flex;flex-direction:column;gap:5px;cursor:zoom-in;background:transparent;border:0;padding:0;text-align:left;color:var(--muted)}
+.prev-card canvas{width:100%;aspect-ratio:1;border-radius:8px;border:1px solid var(--line);display:block;
+  background-color:#5d5d63;background-image:linear-gradient(45deg,#535359 25%,transparent 25%,transparent 75%,#535359 75%),linear-gradient(45deg,#535359 25%,transparent 25%,transparent 75%,#535359 75%);background-size:14px 14px;background-position:0 0,7px 7px}
+.prev-card:hover canvas{border-color:var(--line2)}
+.prev-card small{font-size:12px}
+.prev-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;align-items:center}
+.prev-foot span{flex:1;color:var(--faint);font-size:12.5px}
+#previewCanvas{max-width:86vw;max-height:80vh;border-radius:8px;display:none}
+
+.cw{display:flex;gap:22px;align-items:flex-start;margin-top:14px;padding-top:14px;border-top:1px solid var(--line);flex-wrap:wrap}
+.cw-wheel{display:flex;flex-direction:column;gap:10px;align-items:center}
+.cw-wheel .wrap{position:relative;width:180px;height:180px;touch-action:none;cursor:crosshair}
+.cw-wheel canvas{width:180px;height:180px;display:block;border-radius:50%}
+.cw-dot{position:absolute;width:16px;height:16px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.6);transform:translate(-50%,-50%);pointer-events:none}
+.cw-wheel input[type=range]{width:180px;accent-color:var(--accent)}
+.cw-side{flex:1;min-width:240px;display:flex;flex-direction:column;gap:10px}
+.cw-side .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--faint)}
+.cw-row{display:flex;gap:8px;align-items:center}
+.cw-row input[type=text]{background:var(--bg);border:1px solid var(--line2);border-radius:7px;padding:6px 9px;color:var(--text);min-width:0}
+.cw-row input.hex{width:96px;font-family:ui-monospace,Consolas,monospace}
+.cw-row input.nm{flex:1}
+.cw-live{display:flex;gap:12px;align-items:center}
+.cw-live canvas{width:96px;height:96px;border-radius:8px;border:1px solid var(--line);
+  background-color:#5d5d63;background-image:linear-gradient(45deg,#535359 25%,transparent 25%,transparent 75%,#535359 75%),linear-gradient(45deg,#535359 25%,transparent 25%,transparent 75%,#535359 75%);background-size:12px 12px;background-position:0 0,6px 6px}
+.cw-live .sw{width:96px;height:96px;border-radius:8px;border:1px solid rgba(255,255,255,.1)}
+.cw-live p{margin:0;color:var(--faint);font-size:12.5px;max-width:260px}
+.rc .x{border:0;background:transparent;color:var(--faint);padding:0 2px;font-size:15px;line-height:1}
+.rc .x:hover{color:#ffb4b4}
 .confirm-list{color:var(--muted);font-size:13px;max-height:160px;overflow:auto;margin:0;padding-left:18px}
 .others .tiles{grid-template-columns:repeat(auto-fill,minmax(110px,1fr))}
 
@@ -182,6 +251,11 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
     <div class="content">
       <div id="updateBar"></div>
       <div id="banner"></div>
+      <div class="tabs" role="tablist">
+        <button class="tab on" data-tab="skins">Skin backgrounds</button>
+        <button class="tab" data-tab="recolor">Recolor</button>
+      </div>
+      <div class="pane on" id="pane-skins">
       <div class="drop" id="drop">
         <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 15V4m0 0-4 4m4-4 4 4M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3"/></svg></div>
         <div class="txt">
@@ -191,6 +265,50 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
         </div>
         <button class="btn primary" id="pick">Choose files</button>
         <input type="file" id="fileInput" accept=".png,image/png" multiple hidden>
+      </div>
+      </div>
+      <div class="pane" id="pane-recolor">
+        <div class="drop" id="dropRc">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 15V4m0 0-4 4m4-4 4 4M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3"/></svg></div>
+          <div class="txt">
+            <b>Drop your black texture here</b>
+            <span id="rcHint">Exported from Photoshop with no background. You'll see a preview of every ticked colour before anything is saved.</span>
+          </div>
+          <button class="btn primary" id="pickRc">Choose file</button>
+          <input type="file" id="fileInputRc" accept=".png,image/png" hidden>
+        </div>
+        <div class="rc-box">
+          <div class="rc-head"><b>Colours to make</b><div class="hdr-right"><button class="mini" id="rcAll">Select all</button><button class="mini" id="rcNone">None</button></div></div>
+          <div class="rc-grid" id="rcGrid"></div>
+          <div class="cw">
+            <div class="cw-wheel">
+              <div class="wrap" id="cwWrap"><canvas id="cwCanvas" width="360" height="360"></canvas><div class="cw-dot" id="cwDot"></div></div>
+              <input type="range" id="cwVal" min="0" max="100" value="80" title="Brightness">
+            </div>
+            <div class="cw-side">
+              <div class="lbl">Custom colour · Linear Dodge (Add)</div>
+              <div class="cw-row"><input type="text" class="hex" id="cwHex" spellcheck="false" maxlength="7"><input type="text" class="nm" id="cwName" placeholder="Name, e.g. Purple" spellcheck="false"></div>
+              <div class="cw-live"><div class="sw" id="cwSwatch"></div><canvas id="cwPrev"></canvas><p id="cwNote">Drop a black texture above to see this colour on it live.</p></div>
+              <div class="cw-row"><button class="btn sm primary" id="cwAdd">Add to this batch</button><button class="btn sm" id="cwPreset">Save as preset</button></div>
+            </div>
+          </div>
+          <div class="rc-opts">
+            <label class="check"><input type="checkbox" id="rcKeepBlack" checked><span>Also save the black texture as</span><input type="text" id="rcBlackName" value="Black" spellcheck="false"><span>.png</span></label>
+            <label class="check"><input type="checkbox" id="rcSkins" checked><span>Make the 6 skin versions for every colour</span></label>
+          </div>
+        </div>
+        <div class="rc-prev" id="rcPrev">
+          <div class="rc-prev-head">
+            <b>Preview</b><span class="file" id="rcPrevFile"></span>
+            <div class="bg-pick" id="rcBgPick"></div>
+          </div>
+          <div class="prev-grid" id="rcPrevGrid"></div>
+          <div class="prev-foot">
+            <span id="rcPrevNote"></span>
+            <button class="btn" id="rcCancel">Cancel</button>
+            <button class="btn primary" id="rcSave">Save</button>
+          </div>
+        </div>
       </div>
       <div class="status" id="status"></div>
       <div id="files"></div>
@@ -221,6 +339,11 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
       <label>Skin colours (Skin1 → Skin6)</label>
       <div class="skins" id="setSkins"></div>
     </div>
+    <div class="field">
+      <label>Recolor presets (Color Overlay, 100% opacity)</label>
+      <div class="rc-rows" id="setRecolors"></div>
+      <button class="mini" id="setAddRc" style="margin-top:6px">+ Add colour</button>
+    </div>
     <label class="check"><input type="checkbox" id="setOverwrite"><span>Replace files that already exist with the same name (turn off to keep old versions and skip them)</span></label>
     <div class="err-line" id="setErr"></div>
   </div>
@@ -230,7 +353,7 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
   </div>
 </dialog>
 
-<div class="preview" id="preview"><div><img id="previewImg" alt=""><div class="cap" id="previewCap"></div></div></div>
+<div class="preview" id="preview"><div><img id="previewImg" alt=""><canvas id="previewCanvas"></canvas><div class="cap" id="previewCap"></div></div></div>
 
 <script>
 const $ = s => document.querySelector(s);
@@ -255,6 +378,7 @@ async function loadState(){
   $('#banner').innerHTML = s.rootExists ? '' :
     `<div class="banner">The Wigs folder was not found: <b>${esc(s.settings.root)}</b>. Check it in Settings.</div>`;
   renderSwatches();
+  renderRecolors();
   if(!st.year) st.year = st.years.includes(st.nowYear) ? st.nowYear : (st.years.at(-1) || st.nowYear);
   renderYears();
   await loadMonths();
@@ -371,7 +495,7 @@ async function loadFiles(){
   box.querySelectorAll('[data-del]').forEach(b=>{ b.onclick=e=>{ e.stopPropagation(); askDelete([b.dataset.del], b.dataset.del); }; b.ondblclick=e=>e.stopPropagation(); });
   box.querySelectorAll('[data-gen]').forEach(b=>b.onclick=()=>generateMissing(JSON.parse(b.dataset.gen), b));
   box.querySelectorAll('.tile[data-n]').forEach(t=>{
-    t.onclick = ()=>{ $('#previewImg').src = thumbUrl(t.dataset.n, t.dataset.m)+'&big=1'; $('#previewCap').textContent=t.dataset.n; $('#preview').classList.add('show'); };
+    t.onclick = ()=>{ $('#previewCanvas').style.display='none'; $('#previewImg').style.display=''; $('#previewImg').src = thumbUrl(t.dataset.n, t.dataset.m)+'&big=1'; $('#previewCap').textContent=t.dataset.n; $('#preview').classList.add('show'); };
     t.ondblclick = ()=> post('/api/open', {year:st.year, month:st.month, folder:st.folder, select:t.dataset.n});
   });
 }
@@ -452,9 +576,13 @@ function showStatus(lines){
 }
 
 const drop = $('#drop');
-['dragenter','dragover'].forEach(ev=>document.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.add('over'); }));
-['dragleave','drop'].forEach(ev=>document.addEventListener(ev, e=>{ e.preventDefault(); if(ev==='drop' || !e.relatedTarget) drop.classList.remove('over'); }));
-document.addEventListener('drop', e=>{ if(e.dataTransfer?.files?.length) processFiles(e.dataTransfer.files); });
+const activeDrop = ()=> st.tab==='recolor' ? $('#dropRc') : drop;
+['dragenter','dragover'].forEach(ev=>document.addEventListener(ev, e=>{ e.preventDefault(); activeDrop().classList.add('over'); }));
+['dragleave','drop'].forEach(ev=>document.addEventListener(ev, e=>{ e.preventDefault(); if(ev==='drop' || !e.relatedTarget){ drop.classList.remove('over'); $('#dropRc').classList.remove('over'); } }));
+document.addEventListener('drop', e=>{
+  if(!e.dataTransfer?.files?.length) return;
+  if(st.tab==='recolor') loadRcPreview(e.dataTransfer.files); else processFiles(e.dataTransfer.files);
+});
 $('#pick').onclick = ()=>$('#fileInput').click();
 $('#fileInput').onchange = e=>{ processFiles(e.target.files); e.target.value=''; };
 
@@ -494,6 +622,8 @@ $('#openSettings').onclick = ()=>{
   $('#setRoot').value = st.settings.root;
   $('#setOverwrite').checked = st.settings.overwrite;
   $('#setSkins').innerHTML = st.settings.skins.map((c,i)=>`<div class="skin"><input type="color" value="${c.toLowerCase()}"><span>Skin${i+1}</span></div>`).join('');
+  $('#setRecolors').innerHTML = '';
+  (st.settings.recolors||[]).forEach(addRcRow);
   $('#setErr').textContent = '';
   $('#settingsDlg').showModal();
 };
@@ -501,11 +631,308 @@ $('#setCancel').onclick = ()=>$('#settingsDlg').close();
 $('#setSave').onclick = async ()=>{
   const skins = [...$('#setSkins').querySelectorAll('input')].map(i=>i.value.toUpperCase());
   try{
-    await post('/api/settings', {root:$('#setRoot').value, skins, overwrite:$('#setOverwrite').checked});
+    const recolors = [...$('#setRecolors').querySelectorAll('.rc-row')].map(r=>({
+      name: r.querySelector('input[type=text]').value.trim(),
+      hex: r.querySelector('input[type=color]').value.toUpperCase(),
+      mode: r.querySelector('select').value,
+    }));
+    await post('/api/settings', {root:$('#setRoot').value, skins, overwrite:$('#setOverwrite').checked, recolors});
     $('#settingsDlg').close();
     st.year=''; st.month=''; st.folder='';
     await loadState();
   }catch(e){ $('#setErr').textContent = e.message; }
+};
+
+
+/* tabs */
+st.tab = 'skins';
+try{ if(localStorage.getItem('tab')==='recolor' || location.hash==='#recolor') st.tab='recolor'; }catch(e){}
+function setTab(t){
+  st.tab = t;
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on', b.dataset.tab===t));
+  $('#pane-skins').classList.toggle('on', t==='skins');
+  $('#pane-recolor').classList.toggle('on', t==='recolor');
+  try{ localStorage.setItem('tab', t); }catch(e){}
+}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+setTab(st.tab);
+
+/* recolor */
+const MODE_LABEL = {color:'Color', add:'Linear Dodge (Add)'};
+function rcChecked(){
+  try{ const v = JSON.parse(localStorage.getItem('rcChecked')); if(Array.isArray(v)) return new Set(v); }catch(e){}
+  return null;
+}
+function saveRcChecked(){
+  const on = [...$('#rcGrid').querySelectorAll('input:checked')].map(i=>i.value);
+  try{ localStorage.setItem('rcChecked', JSON.stringify(on)); }catch(e){}
+}
+function renderRecolors(){
+  const saved = rcChecked();
+  $('#rcGrid').innerHTML = (st.settings.recolors||[]).map(r=>{
+    const on = saved ? saved.has(r.name) : true;
+    return `<label class="rc ${on?'on':''}"><input type="checkbox" value="${esc(r.name)}" ${on?'checked':''}><i style="background:${esc(r.hex)}"></i><span class="nm">${esc(r.name)}</span><em>${r.mode==='color'?'Color':'Add'}</em></label>`;
+  }).join('') + (st.customs||[]).map((r,i)=>`<label class="rc on" title="Custom colour for this batch only"><input type="checkbox" checked disabled><i style="background:${esc(r.hex)}"></i><span class="nm">${esc(r.name)}</span><em>Custom</em><button class="x" data-rmc="${i}" title="Remove">&times;</button></label>`).join('')
+    || '<div class="empty-note">No presets yet. Add some in Settings.</div>';
+  $('#rcGrid').querySelectorAll('[data-rmc]').forEach(b=>b.onclick=e=>{ e.preventDefault(); st.customs.splice(+b.dataset.rmc,1); renderRecolors(); renderRcPreview(); });
+  $('#rcGrid').querySelectorAll('input').forEach(i=>i.onchange=()=>{ i.closest('.rc').classList.toggle('on', i.checked); saveRcChecked(); renderRcPreview(); });
+}
+$('#rcAll').onclick = ()=>{ $('#rcGrid').querySelectorAll('input').forEach(i=>{ i.checked=true; i.closest('.rc').classList.add('on'); }); saveRcChecked(); renderRcPreview(); };
+$('#rcNone').onclick = ()=>{ $('#rcGrid').querySelectorAll('input').forEach(i=>{ i.checked=false; i.closest('.rc').classList.remove('on'); }); saveRcChecked(); renderRcPreview(); };
+try{
+  const o = JSON.parse(localStorage.getItem('rcOpts')||'{}');
+  if('keep' in o) $('#rcKeepBlack').checked = o.keep;
+  if('skins' in o) $('#rcSkins').checked = o.skins;
+  if(o.blackName) $('#rcBlackName').value = o.blackName;
+}catch(e){}
+function saveRcOpts(){ try{ localStorage.setItem('rcOpts', JSON.stringify({keep:$('#rcKeepBlack').checked, skins:$('#rcSkins').checked, blackName:$('#rcBlackName').value})); }catch(e){} }
+['#rcKeepBlack','#rcSkins','#rcBlackName'].forEach(id=>$(id).onchange=()=>{ saveRcOpts(); renderRcPreview(); });
+
+const RC_HINT = 'Exported from Photoshop with no background. You\'ll see a preview of every ticked colour before anything is saved.';
+async function recolorFile(list){
+  const pngs = [...list].filter(f=>/\.png$/i.test(f.name));
+  if(pngs.length !== 1){ showStatus([{cls:'err', k:'Recolor', v:'Drop one black .png texture at a time.'}]); return; }
+  if(!st.month){ showStatus([{cls:'err', k:'No month', v:'Pick a month first.'}]); return; }
+  const colors = [...$('#rcGrid').querySelectorAll('input:checked')].map(i=>i.value);
+  const keep = $('#rcKeepBlack').checked;
+  const customs = st.customs||[];
+  if(!colors.length && !keep && !customs.length){ showStatus([{cls:'err', k:'Recolor', v:'Tick at least one colour.'}]); return; }
+  const fd = new FormData();
+  fd.append('year', st.year); fd.append('month', st.month); fd.append('folder', st.folder);
+  fd.append('colors', JSON.stringify(colors));
+  fd.append('custom', JSON.stringify(customs));
+  fd.append('keepBlack', keep?'1':'0');
+  fd.append('blackName', $('#rcBlackName').value.trim() || 'Black');
+  fd.append('skins', $('#rcSkins').checked?'1':'0');
+  fd.append('file', pngs[0], pngs[0].name);
+  const dz = $('#dropRc');
+  dz.classList.add('busy');
+  const n = colors.length + customs.length + (keep?1:0);
+  $('#rcHint').textContent = `Making ${n} colour${n===1?'':'s'}${$('#rcSkins').checked?' with skin versions':''}... this can take a few seconds.`;
+  try{
+    const r = await api('/api/recolor', {method:'POST', body:fd});
+    st.fresh = new Set(r.results.filter(x=>!x.error).map(x=>x.name));
+    const total = r.results.reduce((a,x)=>a+(x.created?x.created.length:0),0);
+    const lines = r.results.filter(x=>x.error||x.warning).map(x=>({cls:x.error?'err':'warn', k:x.name, v:x.error||x.warning}));
+    lines.unshift({cls:'ok', k:'Recolor done', v:`${r.results.length - lines.length} colour${r.results.length===1?'':'s'}, ${total} files saved`});
+    showStatus(lines);
+    clearRcPreview();
+    st.customs = [];
+    await loadState();
+  }catch(e){ showStatus([{cls:'err', k:'Recolor', v:e.message}]); }
+  finally{ dz.classList.remove('busy'); $('#rcHint').textContent = RC_HINT; }
+}
+$('#pickRc').onclick = ()=>$('#fileInputRc').click();
+$('#fileInputRc').onchange = e=>{ loadRcPreview(e.target.files); e.target.value=''; };
+
+function addRcRow(r){
+  r = r || {name:'', hex:'#888888', mode:'add'};
+  const row = document.createElement('div');
+  row.className = 'rc-row';
+  row.innerHTML = `<input type="text" placeholder="Name, e.g. Purple" value="${esc(r.name)}" spellcheck="false"><input type="color" value="${esc(r.hex.toLowerCase())}"><select><option value="add">Linear Dodge (Add)</option><option value="color">Color</option></select><button class="icon-btn" title="Remove"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>`;
+  row.querySelector('select').value = r.mode;
+  row.querySelector('button').onclick = ()=>row.remove();
+  $('#setRecolors').appendChild(row);
+}
+$('#setAddRc').onclick = ()=>{ addRcRow(); const ins = $('#setRecolors').querySelectorAll('input[type=text]'); ins[ins.length-1].focus(); };
+
+/* recolor preview (same math as the app uses when saving) */
+const rcPrev = { file:null, bitmap:null, small:null, bg:-1 };
+function hexRGB(h){ h=h.replace('#',''); return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)]; }
+function applyRecolor(src, preset){
+  const out = new ImageData(new Uint8ClampedArray(src.data), src.width, src.height);
+  if(!preset) return out;
+  const d = out.data, [cr,cg,cb] = hexRGB(preset.hex);
+  if(preset.mode==='add'){
+    for(let i=0;i<d.length;i+=4){ if(!d[i+3]) continue; d[i]=Math.min(255,d[i]+cr); d[i+1]=Math.min(255,d[i+1]+cg); d[i+2]=Math.min(255,d[i+2]+cb); }
+  } else {
+    const R=cr/255, G=cg/255, B=cb/255, lc=0.3*R+0.59*G+0.11*B;
+    for(let i=0;i<d.length;i+=4){
+      if(!d[i+3]) continue;
+      const l = 0.3*d[i]/255 + 0.59*d[i+1]/255 + 0.11*d[i+2]/255;
+      let r=R+(l-lc), g=G+(l-lc), b=B+(l-lc);
+      const L=0.3*r+0.59*g+0.11*b, n=Math.min(r,g,b), x=Math.max(r,g,b);
+      if(n<0){ r=L+(r-L)*L/(L-n); g=L+(g-L)*L/(L-n); b=L+(b-L)*L/(L-n); }
+      if(x>1){ r=L+(r-L)*(1-L)/(x-L); g=L+(g-L)*(1-L)/(x-L); b=L+(b-L)*(1-L)/(x-L); }
+      d[i]=Math.round(r*255); d[i+1]=Math.round(g*255); d[i+2]=Math.round(b*255);
+    }
+  }
+  return out;
+}
+function drawInto(canvas, imgData, bgHex){
+  const tmp = document.createElement('canvas'); tmp.width=imgData.width; tmp.height=imgData.height;
+  tmp.getContext('2d').putImageData(imgData,0,0);
+  canvas.width=imgData.width; canvas.height=imgData.height;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(bgHex){ ctx.fillStyle=bgHex; ctx.fillRect(0,0,canvas.width,canvas.height); }
+  ctx.drawImage(tmp,0,0);
+}
+function scaled(bitmap, size){
+  const c = document.createElement('canvas');
+  const k = Math.min(1, size/Math.max(bitmap.width,bitmap.height));
+  c.width=Math.max(1,Math.round(bitmap.width*k)); c.height=Math.max(1,Math.round(bitmap.height*k));
+  const ctx = c.getContext('2d'); ctx.imageSmoothingQuality='high';
+  ctx.drawImage(bitmap,0,0,c.width,c.height);
+  return ctx.getImageData(0,0,c.width,c.height);
+}
+function previewItems(){
+  const items = [];
+  if($('#rcKeepBlack').checked) items.push({name:($('#rcBlackName').value.trim()||'Black'), preset:null});
+  const on = new Set([...$('#rcGrid').querySelectorAll('input:checked')].map(i=>i.value));
+  (st.settings.recolors||[]).forEach(p=>{ if(on.has(p.name)) items.push({name:p.name, preset:p}); });
+  (st.customs||[]).forEach(p=>items.push({name:p.name, preset:p}));
+  return items;
+}
+async function loadRcPreview(list){
+  const pngs = [...list].filter(f=>/\.png$/i.test(f.name));
+  if(pngs.length !== 1){ showStatus([{cls:'err', k:'Recolor', v:'Drop one black .png texture at a time.'}]); return; }
+  try{
+    const bmp = await createImageBitmap(pngs[0]);
+    rcPrev.file = pngs[0]; rcPrev.bitmap = bmp; rcPrev.small = scaled(bmp, 220);
+  }catch(e){ showStatus([{cls:'err', k:'Recolor', v:'Could not read this PNG.'}]); return; }
+  const a = rcPrev.small.data; let transparent=false;
+  for(let i=3;i<a.length;i+=4){ if(a[i]<250){ transparent=true; break; } }
+  $('#rcPrevFile').textContent = rcPrev.file.name + (transparent ? '' : ' — warning: no transparent background');
+  $('#status').classList.remove('show');
+  $('#rcPrev').classList.add('show');
+  renderBgPick();
+  renderRcPreview();
+  $('#rcPrev').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+function renderBgPick(){
+  const skins = st.settings.skins;
+  $('#rcBgPick').innerHTML = 'Background' +
+    `<button class="none ${rcPrev.bg<0?'on':''}" data-bg="-1" title="Transparent"></button>` +
+    skins.map((c,i)=>`<button class="${rcPrev.bg===i?'on':''}" data-bg="${i}" title="Skin${i+1}" style="background:${c}"></button>`).join('');
+  $('#rcBgPick').querySelectorAll('button').forEach(b=>b.onclick=()=>{ rcPrev.bg=+b.dataset.bg; renderBgPick(); renderRcPreview(); });
+}
+function renderRcPreview(){
+  if(typeof cwChanged==='function') cwChanged(true);
+  if(!rcPrev.small) return;
+  const items = previewItems();
+  const bg = rcPrev.bg>=0 ? st.settings.skins[rcPrev.bg] : null;
+  const grid = $('#rcPrevGrid'); grid.innerHTML='';
+  items.forEach(it=>{
+    const card = document.createElement('button'); card.className='prev-card'; card.title='Click to see it bigger';
+    const cv = document.createElement('canvas'); drawInto(cv, applyRecolor(rcPrev.small, it.preset), bg);
+    const lbl = document.createElement('small'); lbl.textContent = it.name;
+    card.append(cv, lbl);
+    card.onclick = ()=>bigPreview(it, bg);
+    grid.appendChild(card);
+  });
+  const skins = $('#rcSkins').checked;
+  const files = items.length * (skins?7:1);
+  $('#rcPrevNote').textContent = items.length ? `${items.length} colour${items.length===1?'':'s'} · ${files} files will be saved to ${st.folder||st.month}` : 'Tick at least one colour.';
+  $('#rcSave').textContent = items.length ? `Save ${items.length} colour${items.length===1?'':'s'}` : 'Save';
+  $('#rcSave').disabled = !items.length;
+}
+function bigPreview(it, bg){
+  const cv = $('#previewCanvas');
+  drawInto(cv, applyRecolor(scaled(rcPrev.bitmap, 1024), it.preset), bg);
+  $('#previewImg').style.display='none'; cv.style.display='block';
+  $('#previewCap').textContent = it.name + (bg ? ` on Skin${rcPrev.bg+1}` : '');
+  $('#preview').classList.add('show');
+}
+function clearRcPreview(){
+  rcPrev.file=null; rcPrev.bitmap=null; rcPrev.small=null;
+  $('#rcPrev').classList.remove('show'); $('#rcPrevGrid').innerHTML='';
+  cwChanged(true);
+}
+$('#rcCancel').onclick = clearRcPreview;
+$('#rcSave').onclick = ()=>{ if(rcPrev.file) recolorFile([rcPrev.file]); };
+
+/* colour wheel (custom Linear Dodge colours) */
+st.customs = [];
+const cw = { h:0, s:0.6, v:0.8 };
+function hsv2rgb(h,s,v){
+  const f=n=>{ const k=(n+h/60)%6; return v - v*s*Math.max(0, Math.min(k, 4-k, 1)); };
+  return [f(5),f(3),f(1)].map(x=>Math.round(x*255));
+}
+function rgb2hsv(r,g,b){
+  r/=255; g/=255; b/=255;
+  const x=Math.max(r,g,b), n=Math.min(r,g,b), d=x-n;
+  let h=0;
+  if(d){ h = x===r ? ((g-b)/d)%6 : x===g ? (b-r)/d+2 : (r-g)/d+4; h*=60; if(h<0) h+=360; }
+  return {h, s: x? d/x : 0, v: x};
+}
+const toHex = ([r,g,b]) => '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('').toUpperCase();
+function drawWheel(){
+  const c=$('#cwCanvas'), ctx=c.getContext('2d'), W=c.width, R=W/2;
+  const img=ctx.createImageData(W,W), d=img.data;
+  for(let y=0;y<W;y++) for(let x=0;x<W;x++){
+    const dx=x-R+0.5, dy=y-R+0.5, r=Math.hypot(dx,dy), i=(y*W+x)*4;
+    if(r>R){ d[i+3]=0; continue; }
+    const h=(Math.atan2(dy,dx)*180/Math.PI+360)%360;
+    const [rr,gg,bb]=hsv2rgb(h, r/R, cw.v);
+    d[i]=rr; d[i+1]=gg; d[i+2]=bb; d[i+3]= r>R-1 ? Math.round(255*(R-r)) : 255;
+  }
+  ctx.putImageData(img,0,0);
+}
+function placeDot(){
+  const R=90, a=cw.h*Math.PI/180;
+  $('#cwDot').style.left=(R+Math.cos(a)*cw.s*R)+'px';
+  $('#cwDot').style.top=(R+Math.sin(a)*cw.s*R)+'px';
+  $('#cwDot').style.background=toHex(hsv2rgb(cw.h,cw.s,cw.v));
+}
+let cwRaf=0;
+function cwChanged(fromHex){
+  const hex = toHex(hsv2rgb(cw.h,cw.s,cw.v));
+  if(!fromHex) $('#cwHex').value = hex;
+  $('#cwSwatch').style.background = hex;
+  placeDot();
+  cancelAnimationFrame(cwRaf);
+  cwRaf = requestAnimationFrame(()=>{
+    if(rcPrev.small){
+      const bg = rcPrev.bg>=0 ? st.settings.skins[rcPrev.bg] : null;
+      drawInto($('#cwPrev'), applyRecolor(rcPrev.small, {hex, mode:'add'}), bg);
+      $('#cwPrev').style.display=''; $('#cwNote').style.display='none';
+    } else { $('#cwPrev').style.display='none'; $('#cwNote').style.display=''; }
+  });
+}
+(function(){
+  const wrap=$('#cwWrap');
+  const pick=e=>{
+    const b=wrap.getBoundingClientRect(), dx=e.clientX-b.left-90, dy=e.clientY-b.top-90;
+    cw.h=(Math.atan2(dy,dx)*180/Math.PI+360)%360; cw.s=Math.min(1, Math.hypot(dx,dy)/90);
+    cwChanged();
+  };
+  wrap.addEventListener('pointerdown', e=>{ wrap.setPointerCapture(e.pointerId); pick(e); });
+  wrap.addEventListener('pointermove', e=>{ if(wrap.hasPointerCapture(e.pointerId)) pick(e); });
+  $('#cwVal').oninput = ()=>{ cw.v = $('#cwVal').value/100; drawWheel(); cwChanged(); };
+  $('#cwHex').oninput = ()=>{
+    const m = $('#cwHex').value.trim().match(/^#?([0-9a-f]{6})$/i);
+    if(!m) return;
+    const o = rgb2hsv(...hexRGB(m[1])); cw.h=o.h; cw.s=o.s; cw.v=o.v;
+    $('#cwVal').value = Math.round(cw.v*100); drawWheel(); cwChanged(true);
+  };
+  drawWheel(); cwChanged();
+})();
+function customFromInputs(){
+  const hex = toHex(hsv2rgb(cw.h,cw.s,cw.v));
+  const name = $('#cwName').value.trim().replace(/\s+/g,'');
+  if(!name){ showStatus([{cls:'err', k:'Custom colour', v:'Give it a name first (it becomes the file name, e.g. Purple.png).'}]); $('#cwName').focus(); return null; }
+  if(!/^[A-Za-z0-9_\-]+$/.test(name)){ showStatus([{cls:'err', k:'Custom colour', v:'Use only letters, numbers, - and _ in the name.'}]); return null; }
+  const taken = [...(st.settings.recolors||[]), ...st.customs].some(r=>r.name.toLowerCase()===name.toLowerCase()) || name.toLowerCase()===($('#rcBlackName').value.trim()||'Black').toLowerCase();
+  if(taken){ showStatus([{cls:'err', k:'Custom colour', v:`"${name}" is already used. Pick another name.`}]); return null; }
+  return {name, hex, mode:'add'};
+}
+$('#cwAdd').onclick = ()=>{
+  const c = customFromInputs(); if(!c) return;
+  st.customs.push(c); $('#cwName').value='';
+  renderRecolors(); renderRcPreview();
+};
+$('#cwPreset').onclick = async ()=>{
+  const c = customFromInputs(); if(!c) return;
+  const s = st.settings;
+  try{
+    await post('/api/settings', {root:s.root, skins:s.skins, overwrite:s.overwrite, recolors:[...(s.recolors||[]), c]});
+    $('#cwName').value='';
+    // tick the new preset right away
+    try{ const on = rcChecked() || new Set((s.recolors||[]).map(r=>r.name)); on.add(c.name); localStorage.setItem('rcChecked', JSON.stringify([...on])); }catch(e){}
+    showStatus([{cls:'ok', k:'Preset saved', v:`${c.name} (${c.hex}, Linear Dodge) is now in your presets.`}]);
+    await loadState(); renderRcPreview();
+  }catch(e){ showStatus([{cls:'err', k:'Preset', v:e.message}]); }
 };
 
 /* updates */
