@@ -755,6 +755,7 @@ func main() {
 	}
 
 	loadSettings()
+	go brandWindows()
 
 	// Quit when the window has been closed (no heartbeat for a while).
 	go func() {
