@@ -936,17 +936,23 @@ $('#cwPreset').onclick = async ()=>{
 };
 
 /* updates */
-async function checkUpdate(){
+// On launch, new versions install by themselves. While the app is open it checks
+// every 10 minutes and offers the update without interrupting your work.
+let updating = false;
+async function checkUpdate(auto){
+  if(updating) return;
   try{
     const v = await api('/api/version'); $('#ver').textContent = v.version==='dev' ? '' : '· v'+v.version;
     const u = await api('/api/update/check');
     if(!u.available) return;
     $('#updateBar').innerHTML = `<div class="upd"><span><b>Version ${esc(u.latest)}</b> is available. You have v${esc(u.current)}.</span><button class="btn sm primary" id="updBtn">Update now</button></div>`;
     $('#updBtn').onclick = applyUpdate;
+    if(auto) applyUpdate();
   }catch(e){}
 }
+setInterval(()=>checkUpdate(false), 10*60*1000);
 async function applyUpdate(){
-  const b = $('#updBtn'); b.disabled = true; b.textContent = 'Downloading...';
+  const b = $('#updBtn'); b.disabled = true; b.textContent = 'Updating...'; updating = true;
   try{
     const before = (await api('/api/version')).version;
     await post('/api/update/apply', {});
@@ -959,11 +965,11 @@ async function applyUpdate(){
       }catch(e){}
       if(Date.now()-t0 > 30000){ clearInterval(poll); b.textContent = 'Reopen the app'; }
     }, 600);
-  }catch(e){ b.disabled = false; b.textContent = 'Update now'; showStatus([{cls:'err', k:'Update', v:e.message}]); }
+  }catch(e){ updating = false; b.disabled = false; b.textContent = 'Update now'; showStatus([{cls:'err', k:'Update failed', v:e.message}]); }
 }
 
 loadState();
-checkUpdate();
+checkUpdate(true);
 </script>
 </body>
 </html>
