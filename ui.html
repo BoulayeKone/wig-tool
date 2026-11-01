@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BlayUGC Wig Tool</title>
+<style>
+:root{
+  --bg:#141416; --panel:#1b1b1e; --panel2:#222226; --line:#2c2c31; --line2:#3a3a40;
+  --text:#ececee; --muted:#9a9aa3; --faint:#6c6c74;
+  --accent:#e3a47c; --accent-ink:#2a1a10; --ok:#7fc49a; --warn:#e6c26e; --err:#ef7d7d;
+  --radius:10px;
+  font-family:"Segoe UI Variable Text","Segoe UI",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-size:14px}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+.app{display:grid;grid-template-columns:280px 1fr;height:100vh}
+
+/* sidebar */
+aside{background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.brand{padding:18px 18px 14px;border-bottom:1px solid var(--line)}
+.brand b{display:block;font-size:15px;letter-spacing:.2px}
+.brand span{color:var(--muted);font-size:12px}
+.side-scroll{overflow:auto;flex:1;padding:14px 12px 20px}
+.label{font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--faint);margin:14px 6px 8px;display:flex;justify-content:space-between;align-items:center}
+.label:first-child{margin-top:2px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 4px}
+.chip{border:1px solid var(--line2);background:transparent;border-radius:7px;padding:5px 11px;color:var(--muted)}
+.chip:hover{color:var(--text);border-color:#4a4a52}
+.chip.on{background:var(--text);color:#111;border-color:var(--text)}
+.chip.ghost{border-style:dashed}
+.list{display:flex;flex-direction:column;gap:2px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;text-align:left;background:transparent;border:0;border-radius:7px;padding:7px 10px;color:var(--muted)}
+.row:hover{background:var(--panel2);color:var(--text)}
+.row.on{background:#2b2b31;color:var(--text)}
+.row .n{font-size:12px;color:var(--faint);font-variant-numeric:tabular-nums}
+.row.ghost{color:var(--faint);font-style:italic}
+.mini{background:transparent;border:0;color:var(--muted);font-size:12px;padding:2px 4px;border-radius:5px;text-transform:none;letter-spacing:0}
+.mini:hover{color:var(--text);background:var(--panel2)}
+.newf{display:none;gap:6px;padding:6px 4px 0}
+.newf.show{display:flex}
+.newf input{flex:1;min-width:0;background:var(--bg);border:1px solid var(--line2);border-radius:7px;padding:6px 9px}
+.newf input:focus{outline:none;border-color:var(--accent)}
+.side-foot{border-top:1px solid var(--line);padding:10px 12px}
+.side-foot .row{color:var(--muted)}
+.empty-note{color:var(--faint);font-size:12.5px;padding:4px 10px}
+
+/* main */
+main{display:flex;flex-direction:column;min-width:0;min-height:0}
+header{display:flex;align-items:center;gap:12px;padding:14px 22px;border-bottom:1px solid var(--line)}
+.crumbs{flex:1;min-width:0;display:flex;align-items:center;gap:6px;color:var(--muted);white-space:nowrap;overflow:hidden}
+.crumbs b{color:var(--text);font-weight:600}
+.crumbs i{color:var(--faint);font-style:normal}
+.btn{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line2);background:var(--panel2);border-radius:8px;padding:7px 12px}
+.btn:hover{border-color:#4a4a52}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+.btn.primary:hover{filter:brightness(1.05)}
+.btn svg{width:15px;height:15px}
+.content{flex:1;overflow:auto;padding:18px 22px 40px}
+
+.drop{border:1.5px dashed var(--line2);border-radius:12px;padding:22px;display:flex;align-items:center;gap:18px;background:var(--panel);transition:border-color .15s,background .15s}
+.drop.over{border-color:var(--accent);background:#211b17}
+.drop .ic{width:42px;height:42px;border-radius:10px;background:var(--panel2);display:grid;place-items:center;color:var(--accent);flex:none}
+.drop .ic svg{width:22px;height:22px}
+.drop .txt{flex:1}
+.drop .txt b{display:block;margin-bottom:3px}
+.drop .txt span{color:var(--muted);font-size:13px}
+.swatches{display:flex;gap:4px;margin-top:9px}
+.swatches i{width:18px;height:18px;border-radius:4px;display:block;border:1px solid rgba(255,255,255,.08)}
+.drop.busy{opacity:.7;pointer-events:none}
+
+.status{margin-top:12px;display:none;border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:10px 14px;font-size:13px}
+.status.show{display:block}
+.status .line{display:flex;gap:10px;padding:3px 0}
+.status .line .k{min-width:150px;font-weight:600}
+.status .ok{color:var(--ok)} .status .warn{color:var(--warn)} .status .err{color:var(--err)}
+
+.sec-title{display:flex;align-items:baseline;justify-content:space-between;margin:24px 0 10px}
+.sec-title h2{font-size:14px;margin:0;font-weight:600}
+.sec-title span{color:var(--faint);font-size:12.5px}
+
+.group{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.group.fresh{border-color:#6b5240}
+.ghead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.ghead b{font-weight:600}
+.ghead .meta{color:var(--faint);font-size:12px}
+.ghead .meta.missing{color:var(--warn)}
+.ghead .right,.hdr-right{display:flex;align-items:center;gap:12px}
+.btn.sm{padding:4px 10px;font-size:12.5px}
+.btn:disabled{opacity:.55;cursor:default}
+.tiles{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+.tile{display:flex;flex-direction:column;gap:5px;background:transparent;border:0;padding:0;text-align:left;color:var(--muted)}
+.tile .img{aspect-ratio:1;border-radius:8px;overflow:hidden;border:1px solid var(--line);
+  background-color:#5d5d63;background-image:linear-gradient(45deg,#535359 25%,transparent 25%,transparent 75%,#535359 75%),linear-gradient(45deg,#535359 25%,transparent 25%,transparent 75%,#535359 75%);
+  background-size:14px 14px;background-position:0 0,7px 7px}
+.tile img{width:100%;height:100%;object-fit:cover;display:block}
+.tile .img.none{background:var(--bg);border-style:dashed;display:grid;place-items:center;color:var(--faint);font-size:11px}
+.tile small{font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile:hover small{color:var(--text)}
+.tile:hover .img{border-color:var(--line2)}
+.others .tiles{grid-template-columns:repeat(auto-fill,minmax(110px,1fr))}
+
+.placeholder{color:var(--muted);text-align:center;padding:60px 20px}
+.placeholder b{display:block;color:var(--text);margin-bottom:6px;font-size:15px}
+
+/* settings dialog */
+dialog{background:var(--panel);color:var(--text);border:1px solid var(--line2);border-radius:14px;padding:0;width:min(560px,92vw)}
+dialog::backdrop{background:rgba(0,0,0,.55)}
+.dlg-h{padding:16px 20px;border-bottom:1px solid var(--line);font-weight:600}
+.dlg-b{padding:16px 20px;display:flex;flex-direction:column;gap:16px}
+.dlg-f{padding:12px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+.field input[type=text]{width:100%;background:var(--bg);border:1px solid var(--line2);border-radius:8px;padding:8px 10px}
+.skins{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.skin{display:flex;flex-direction:column;gap:5px;align-items:center;font-size:11.5px;color:var(--muted)}
+.skin input[type=color]{width:100%;height:38px;border:1px solid var(--line2);border-radius:8px;background:none;padding:0;cursor:pointer}
+.skin input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+.skin input[type=color]::-webkit-color-swatch{border:0;border-radius:7px}
+.check{display:flex;gap:9px;align-items:flex-start;color:var(--muted);font-size:13px}
+.check input{margin-top:2px;accent-color:var(--accent)}
+.err-line{color:var(--err);font-size:12.5px;min-height:1em}
+.upd{display:flex;align-items:center;gap:14px;background:var(--panel);border:1px solid #6b5240;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px}
+.upd span{flex:1;color:var(--muted)}
+.upd b{color:var(--text)}
+.banner{background:#2a2216;border:1px solid #5a4728;color:#e9d3a8;border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px}
+
+.preview{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;place-items:center;z-index:10}
+.preview.show{display:grid}
+.preview img{max-width:86vw;max-height:80vh;border-radius:8px;background:#5d5d63}
+.preview .cap{color:var(--text);text-align:center;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <div class="brand"><b>BlayUGC Wig Tool</b><span>Hair texture organiser <span id="ver"></span></span></div>
+    <div class="side-scroll">
+      <div class="label">Year <button class="mini" id="addYear">+ Year</button></div>
+      <div class="chips" id="years"></div>
+
+      <div class="label">Month</div>
+      <div class="list" id="months"></div>
+
+      <div class="label">Folder <button class="mini" id="addFolder">+ New</button></div>
+      <div class="newf" id="newFolderBox">
+        <input id="newFolderName" placeholder="Folder name">
+        <button class="btn primary" id="newFolderOk">Create</button>
+      </div>
+      <div class="list" id="folders"></div>
+    </div>
+    <div class="side-foot">
+      <button class="row" id="openSettings">
+        <span>Settings</span>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <main>
+    <header>
+      <div class="crumbs" id="crumbs"></div>
+      <button class="btn" id="openExplorer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        Open in Explorer
+      </button>
+    </header>
+    <div class="content">
+      <div id="updateBar"></div>
+      <div id="banner"></div>
+      <div class="drop" id="drop">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 15V4m0 0-4 4m4-4 4 4M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3"/></svg></div>
+        <div class="txt">
+          <b>Drop transparent hair PNGs here</b>
+          <span id="dropHint">Each file is saved as-is, plus 6 versions on the skin colours below (Name.png → NameSkin1.png … NameSkin6.png).</span>
+          <div class="swatches" id="swatches"></div>
+        </div>
+        <button class="btn primary" id="pick">Choose files</button>
+        <input type="file" id="fileInput" accept=".png,image/png" multiple hidden>
+      </div>
+      <div class="status" id="status"></div>
+      <div id="files"></div>
+    </div>
+  </main>
+</div>
+
+<dialog id="settingsDlg">
+  <div class="dlg-h">Settings</div>
+  <div class="dlg-b">
+    <div class="field">
+      <label>Wigs folder</label>
+      <input type="text" id="setRoot" spellcheck="false">
+    </div>
+    <div class="field">
+      <label>Skin colours (Skin1 → Skin6)</label>
+      <div class="skins" id="setSkins"></div>
+    </div>
+    <label class="check"><input type="checkbox" id="setOverwrite"><span>Replace files that already exist with the same name (turn off to keep old versions and skip them)</span></label>
+    <div class="err-line" id="setErr"></div>
+  </div>
+  <div class="dlg-f">
+    <button class="btn" id="setCancel">Cancel</button>
+    <button class="btn primary" id="setSave">Save</button>
+  </div>
+</dialog>
+
+<div class="preview" id="preview"><div><img id="previewImg" alt=""><div class="cap" id="previewCap"></div></div></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const st = { settings:null, years:[], year:'', months:[], month:'', folders:[], folder:'', nowYear:'', nowMonth:'', fresh:new Set() };
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+async function api(path, opts){
+  const r = await fetch(path, opts);
+  const j = await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(j.error || r.statusText);
+  return j;
+}
+const post = (path, body) => api(path, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
+const qs = o => new URLSearchParams(o).toString();
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+setInterval(()=>fetch('/api/ping').catch(()=>{}), 4000); fetch('/api/ping');
+
+async function loadState(){
+  const s = await api('/api/state');
+  st.settings = s.settings; st.years = s.years; st.nowYear = s.nowYear; st.nowMonth = s.nowMonth;
+  $('#banner').innerHTML = s.rootExists ? '' :
+    `<div class="banner">The Wigs folder was not found: <b>${esc(s.settings.root)}</b>. Check it in Settings.</div>`;
+  renderSwatches();
+  if(!st.year) st.year = st.years.includes(st.nowYear) ? st.nowYear : (st.years.at(-1) || st.nowYear);
+  renderYears();
+  await loadMonths();
+}
+
+function renderSwatches(){
+  $('#swatches').innerHTML = st.settings.skins.map((c,i)=>`<i title="Skin${i+1} ${c}" style="background:${c}"></i>`).join('');
+}
+
+function renderYears(){
+  const ys = [...st.years];
+  if(!ys.includes(st.year)) ys.push(st.year);
+  $('#years').innerHTML = ys.map(y=>{
+    const ghost = !st.years.includes(y);
+    return `<button class="chip ${y===st.year?'on':''} ${ghost?'ghost':''}" data-y="${esc(y)}">${esc(y)}</button>`;
+  }).join('');
+  $('#years').querySelectorAll('.chip').forEach(b=>b.onclick=()=>{ st.year=b.dataset.y; st.month=''; st.folder=''; renderYears(); loadMonths(); });
+}
+
+async function loadMonths(){
+  st.months = await api('/api/months?'+qs({year:st.year})).catch(()=>[]);
+  const want = st.year===st.nowYear ? st.nowMonth : null;
+  if(!st.month || !st.months.concat(want||[]).includes(st.month)){
+    st.month = want || st.months.at(-1) || '';
+  }
+  renderMonths();
+  await loadFolders();
+}
+
+function renderMonths(){
+  // all 12 months; missing ones shown faint and are created when chosen
+  const html = MONTHS.map(m=>{
+    const name = `${m} ${st.year}`;
+    const exists = st.months.includes(name);
+    return `<button class="row ${name===st.month?'on':''} ${exists?'':'ghost'}" data-m="${esc(name)}"><span>${esc(name)}</span><span class="n">${exists?'':'new'}</span></button>`;
+  }).join('');
+  const extra = st.months.filter(m=>!MONTHS.some(x=>m===`${x} ${st.year}`))
+    .map(m=>`<button class="row ${m===st.month?'on':''}" data-m="${esc(m)}"><span>${esc(m)}</span></button>`).join('');
+  $('#months').innerHTML = html + extra;
+  $('#months').querySelectorAll('.row').forEach(b=>b.onclick=()=>{ st.month=b.dataset.m; st.folder=''; renderMonths(); loadFolders(); });
+}
+
+async function loadFolders(){
+  st.folders = st.month ? await api('/api/folders?'+qs({year:st.year, month:st.month})).catch(()=>[]) : [];
+  if(st.folder && !st.folders.some(f=>f.name===st.folder)) st.folder='';
+  if(!st.folder && st.folders.length) st.folder = st.folders.at(-1).name;
+  renderFolders();
+  await loadFiles();
+}
+
+function renderFolders(){
+  const rows = st.folders.map(f=>`<button class="row ${f.name===st.folder?'on':''}" data-f="${esc(f.name)}"><span>${esc(f.name)}</span><span class="n">${f.count}</span></button>`).join('');
+  $('#folders').innerHTML = rows || `<div class="empty-note">No folders yet. Files will go straight into ${esc(st.month||'the month folder')}, or create one with + New.</div>`;
+  $('#folders').querySelectorAll('.row').forEach(b=>b.onclick=()=>{ st.folder=b.dataset.f; renderFolders(); loadFiles(); });
+}
+
+function renderCrumbs(){
+  const parts = ['Wigs', st.year, st.month, st.folder].filter(Boolean);
+  $('#crumbs').innerHTML = parts.map((p,i)=> i===parts.length-1 ? `<b>${esc(p)}</b>` : `<span>${esc(p)}</span><i>/</i>`).join(' ');
+}
+
+function suggestFolderName(){
+  let max = 0, prefix = 'Texture Comm';
+  for(const f of st.folders){
+    const m = f.name.match(/^(.*?)\s*(\d+)$/);
+    if(m){ const n = +m[2]; if(n>=max){ max=n; prefix=m[1]; } }
+  }
+  return `${prefix} ${max+1}`;
+}
+
+const thumbUrl = (name, mod) => '/thumb?'+qs({year:st.year, month:st.month, folder:st.folder, name, v:mod});
+
+async function loadFiles(){
+  renderCrumbs();
+  const box = $('#files');
+  if(!st.month){ box.innerHTML = `<div class="placeholder"><b>Pick a month</b>Choose where the textures should go on the left.</div>`; return; }
+  let data;
+  try { data = await api('/api/files?'+qs({year:st.year, month:st.month, folder:st.folder})); }
+  catch(e){ box.innerHTML = `<div class="placeholder">${esc(e.message)}</div>`; return; }
+  const files = data.files;
+  if(!files.length){ box.innerHTML = `<div class="placeholder"><b>Nothing here yet</b>Drop your transparent PNGs above to get started.</div>`; return; }
+
+  const byName = new Map(files.map(f=>[f.name.toLowerCase(), f]));
+  const used = new Set();
+  const groups = [];
+  for(const f of files){
+    const base = f.name.replace(/\.png$/i,'');
+    if(/Skin[1-6]$/i.test(base)) continue;
+    const tiles = [f];
+    used.add(f.name);
+    for(let i=1;i<=6;i++){
+      const s = byName.get(`${base}skin${i}.png`.toLowerCase());
+      tiles.push(s || {missing:`${base}Skin${i}.png`});
+      if(s) used.add(s.name);
+    }
+    groups.push({base, tiles});
+  }
+  // skin files whose base is missing
+  const others = files.filter(f=>!used.has(f.name));
+
+  const incomplete = groups.filter(g=>g.tiles.some(t=>t.missing)).map(g=>g.base);
+  let html = `<div class="sec-title"><h2>${groups.length} colour${groups.length===1?'':'s'}</h2><div class="hdr-right">${incomplete.length>1?`<button class="btn sm primary" data-gen="${esc(JSON.stringify(incomplete))}">Generate all missing (${incomplete.length})</button>`:''}<span>${files.length} PNG files</span></div></div>`;
+  for(const g of groups){
+    const missing = g.tiles.filter(t=>t.missing).length;
+    html += `<div class="group ${st.fresh.has(g.base)?'fresh':''}">
+      <div class="ghead"><b>${esc(g.base)}</b><div class="right"><span class="meta ${missing?'missing':''}">${missing?`${missing} skin version${missing>1?'s':''} missing`:'Complete'}</span>${missing?`<button class="btn sm primary" data-gen="${esc(JSON.stringify([g.base]))}">Generate missing</button>`:''}</div></div>
+      <div class="tiles">${g.tiles.map(tile).join('')}</div></div>`;
+  }
+  if(others.length){
+    html += `<div class="group others"><div class="ghead"><b>Other files</b><span class="meta">${others.length}</span></div><div class="tiles">${others.map(tile).join('')}</div></div>`;
+  }
+  box.innerHTML = html;
+  box.querySelectorAll('[data-gen]').forEach(b=>b.onclick=()=>generateMissing(JSON.parse(b.dataset.gen), b));
+  box.querySelectorAll('.tile[data-n]').forEach(t=>{
+    t.onclick = ()=>{ $('#previewImg').src = thumbUrl(t.dataset.n, t.dataset.m)+'&big=1'; $('#previewCap').textContent=t.dataset.n; $('#preview').classList.add('show'); };
+    t.ondblclick = ()=> post('/api/open', {year:st.year, month:st.month, folder:st.folder, select:t.dataset.n});
+  });
+}
+
+async function generateMissing(names, btn){
+  btn.disabled = true; btn.textContent = 'Generating...';
+  try{
+    const r = await post('/api/generate', {year:st.year, month:st.month, folder:st.folder, names});
+    st.fresh = new Set(r.results.filter(x=>!x.error).map(x=>x.name));
+    showStatus(r.results.map(x=>{
+      if(x.error) return {cls:'err', k:x.name, v:x.error};
+      if(x.warning) return {cls:'warn', k:x.name, v:x.warning};
+      return {cls:'ok', k:x.name, v:`${x.created.length} missing version${x.created.length===1?'':'s'} generated`};
+    }));
+  }catch(e){ showStatus([{cls:'err', k:'Generate', v:e.message}]); }
+  await loadState();
+}
+
+function tile(f){
+  if(f.missing) return `<div class="tile"><div class="img none">missing</div><small>${esc(f.missing.replace(/\.png$/i,''))}</small></div>`;
+  return `<button class="tile" data-n="${esc(f.name)}" data-m="${f.mod}" title="Click to preview, double-click to show in Explorer"><div class="img"><img loading="lazy" src="${thumbUrl(f.name,f.mod)}" alt=""></div><small>${esc(f.name.replace(/\.png$/i,''))}</small></button>`;
+}
+$('#preview').onclick = ()=>$('#preview').classList.remove('show');
+
+/* processing */
+async function processFiles(list){
+  const pngs = [...list].filter(f=>/\.png$/i.test(f.name));
+  if(!pngs.length){ showStatus([{cls:'err', k:'Nothing added', v:'Only .png files are supported.'}]); return; }
+  if(!st.month){ showStatus([{cls:'err', k:'No month', v:'Pick a month first.'}]); return; }
+  const fd = new FormData();
+  fd.append('year', st.year); fd.append('month', st.month); fd.append('folder', st.folder);
+  pngs.forEach(f=>fd.append('files', f, f.name));
+  $('#drop').classList.add('busy');
+  $('#dropHint').textContent = `Working on ${pngs.length} file${pngs.length>1?'s':''}...`;
+  try{
+    const r = await api('/api/process', {method:'POST', body:fd});
+    st.fresh = new Set(r.results.filter(x=>!x.error).map(x=>x.name));
+    showStatus(r.results.map(x=>{
+      if(x.error) return {cls:'err', k:x.name, v:x.error};
+      if(x.warning) return {cls:'warn', k:x.name, v:x.warning};
+      const sk = x.skipped.length ? ` · ${x.skipped.length} kept (already existed)` : '';
+      return {cls:'ok', k:x.name, v:`${x.created.length} file${x.created.length===1?'':'s'} saved${sk}`};
+    }));
+    await loadState();
+  }catch(e){
+    showStatus([{cls:'err', k:'Failed', v:e.message}]);
+  }finally{
+    $('#drop').classList.remove('busy');
+    $('#dropHint').textContent = 'Each file is saved as-is, plus 6 versions on the skin colours below (Name.png → NameSkin1.png … NameSkin6.png).';
+  }
+}
+function showStatus(lines){
+  const s = $('#status');
+  s.innerHTML = lines.map(l=>`<div class="line"><span class="k ${l.cls}">${esc(l.k)}</span><span>${esc(l.v)}</span></div>`).join('');
+  s.classList.add('show');
+}
+
+const drop = $('#drop');
+['dragenter','dragover'].forEach(ev=>document.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.add('over'); }));
+['dragleave','drop'].forEach(ev=>document.addEventListener(ev, e=>{ e.preventDefault(); if(ev==='drop' || !e.relatedTarget) drop.classList.remove('over'); }));
+document.addEventListener('drop', e=>{ if(e.dataTransfer?.files?.length) processFiles(e.dataTransfer.files); });
+$('#pick').onclick = ()=>$('#fileInput').click();
+$('#fileInput').onchange = e=>{ processFiles(e.target.files); e.target.value=''; };
+
+/* folders / years */
+$('#addFolder').onclick = ()=>{
+  const box = $('#newFolderBox'); box.classList.toggle('show');
+  if(box.classList.contains('show')){ $('#newFolderName').value = suggestFolderName(); $('#newFolderName').select(); }
+};
+async function createFolder(){
+  const name = $('#newFolderName').value.trim();
+  if(!name || !st.month) return;
+  try{
+    await post('/api/mkdir', {year:st.year, month:st.month, folder:name});
+    st.folder = name; $('#newFolderBox').classList.remove('show');
+    await loadState();
+  }catch(e){ showStatus([{cls:'err', k:'Folder', v:e.message}]); }
+}
+$('#newFolderOk').onclick = createFolder;
+$('#newFolderName').onkeydown = e=>{ if(e.key==='Enter') createFolder(); if(e.key==='Escape') $('#newFolderBox').classList.remove('show'); };
+
+$('#addYear').onclick = ()=>{
+  const last = Math.max(+st.nowYear, ...st.years.map(Number).filter(n=>!isNaN(n)));
+  const y = String(st.years.includes(String(last)) ? last+1 : last);
+  st.year = y; st.month = ''; st.folder = '';
+  renderYears(); loadMonths();
+};
+
+$('#openExplorer').onclick = async ()=>{
+  try{
+    if(st.month) await post('/api/mkdir', {year:st.year, month:st.month, folder:st.folder});
+    await post('/api/open', {year:st.year, month:st.month, folder:st.folder});
+  }catch(e){ showStatus([{cls:'err', k:'Explorer', v:e.message}]); }
+};
+
+/* settings */
+$('#openSettings').onclick = ()=>{
+  $('#setRoot').value = st.settings.root;
+  $('#setOverwrite').checked = st.settings.overwrite;
+  $('#setSkins').innerHTML = st.settings.skins.map((c,i)=>`<div class="skin"><input type="color" value="${c.toLowerCase()}"><span>Skin${i+1}</span></div>`).join('');
+  $('#setErr').textContent = '';
+  $('#settingsDlg').showModal();
+};
+$('#setCancel').onclick = ()=>$('#settingsDlg').close();
+$('#setSave').onclick = async ()=>{
+  const skins = [...$('#setSkins').querySelectorAll('input')].map(i=>i.value.toUpperCase());
+  try{
+    await post('/api/settings', {root:$('#setRoot').value, skins, overwrite:$('#setOverwrite').checked});
+    $('#settingsDlg').close();
+    st.year=''; st.month=''; st.folder='';
+    await loadState();
+  }catch(e){ $('#setErr').textContent = e.message; }
+};
+
+/* updates */
+async function checkUpdate(){
+  try{
+    const v = await api('/api/version'); $('#ver').textContent = v.version==='dev' ? '' : '· v'+v.version;
+    const u = await api('/api/update/check');
+    if(!u.available) return;
+    $('#updateBar').innerHTML = `<div class="upd"><span><b>Version ${esc(u.latest)}</b> is available. You have v${esc(u.current)}.</span><button class="btn sm primary" id="updBtn">Update now</button></div>`;
+    $('#updBtn').onclick = applyUpdate;
+  }catch(e){}
+}
+async function applyUpdate(){
+  const b = $('#updBtn'); b.disabled = true; b.textContent = 'Downloading...';
+  try{
+    const before = (await api('/api/version')).version;
+    await post('/api/update/apply', {});
+    b.textContent = 'Restarting...';
+    const t0 = Date.now();
+    const poll = setInterval(async ()=>{
+      try{
+        const v = await api('/api/version');
+        if(v.version !== before){ clearInterval(poll); location.reload(); }
+      }catch(e){}
+      if(Date.now()-t0 > 30000){ clearInterval(poll); b.textContent = 'Reopen the app'; }
+    }, 600);
+  }catch(e){ b.disabled = false; b.textContent = 'Update now'; showStatus([{cls:'err', k:'Update', v:e.message}]); }
+}
+
+loadState();
+checkUpdate();
+</script>
+</body>
+</html>
