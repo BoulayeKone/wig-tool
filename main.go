@@ -338,6 +338,32 @@ func makeSkins(dir, base string, img image.Image, s Settings, res *FileResult) {
 	}
 }
 
+// rebuildSkins moves every BaseSkinN.png to the Recycle Bin, then makes Skin1-6
+// fresh from the current Base.png (after it was edited).
+func rebuildSkins(dir, base string, s Settings) FileResult {
+	res := FileResult{Name: base, Created: []string{}, Skipped: []string{}}
+	if n, err := cleanName(base); err != nil || n == "" || skinSuffix.MatchString(base) {
+		res.Error = "Invalid texture name"
+		return res
+	}
+	if _, err := os.Stat(filepath.Join(dir, base+".png")); err != nil {
+		res.Error = "Could not find " + base + ".png"
+		return res
+	}
+	re := regexp.MustCompile(`(?i)^` + regexp.QuoteMeta(base) + `Skin\d+\.png$`)
+	ents, _ := os.ReadDir(dir)
+	for _, e := range ents {
+		if e.IsDir() || !re.MatchString(e.Name()) {
+			continue
+		}
+		if err := recycle([]string{filepath.Join(dir, e.Name())}); err != nil {
+			res.Error = "Could not remove " + e.Name() + ": " + err.Error()
+			return res
+		}
+	}
+	return generateMissing(dir, base, s)
+}
+
 // generateMissing rebuilds only the skin versions that don't exist yet for Base.png.
 func generateMissing(dir, base string, s Settings) FileResult {
 	res := FileResult{Name: base, Created: []string{}, Skipped: []string{}}
@@ -675,6 +701,32 @@ func routes() *http.ServeMux {
 				continue
 			}
 			results = append(results, processOne(dir, filepath.Base(fh.Filename), data, s))
+		}
+		writeJSON(w, map[string]any{"path": dir, "results": results})
+	})
+
+	mux.HandleFunc("/api/rebuild", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "POST only", 405)
+			return
+		}
+		var body struct {
+			Year, Month, Folder string
+			Names               []string
+		}
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			fail(w, err)
+			return
+		}
+		dir, err := target(body.Year, body.Month, body.Folder)
+		if err != nil {
+			fail(w, err)
+			return
+		}
+		s := getSettings()
+		results := []FileResult{}
+		for _, n := range body.Names {
+			results = append(results, rebuildSkins(dir, n, s))
 		}
 		writeJSON(w, map[string]any{"path": dir, "results": results})
 	})

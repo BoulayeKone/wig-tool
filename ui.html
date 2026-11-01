@@ -83,6 +83,8 @@ header{display:flex;align-items:center;gap:12px;padding:14px 22px;border-bottom:
 .sec-title h2{font-size:14px;margin:0;font-weight:600}
 .sec-title span{color:var(--faint);font-size:12.5px}
 
+.group .hover-only{opacity:0;transition:opacity .12s}
+.group:hover .hover-only,.group .hover-only:focus-visible{opacity:1}
 .group{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px}
 .group.fresh{border-color:#6b5240}
 .ghead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
@@ -521,7 +523,7 @@ async function loadFiles(){
   for(const g of groups){
     const missing = g.tiles.filter(t=>t.missing).length;
     html += `<div class="group ${st.fresh.has(g.base)?'fresh':''}">
-      <div class="ghead"><b>${esc(g.base)}</b><div class="right"><span class="meta ${missing?'missing':''}">${missing?`${missing} skin version${missing>1?'s':''} missing`:'Complete'}</span>${missing?`<button class="btn sm primary" data-gen="${esc(JSON.stringify([g.base]))}">Generate missing</button>`:''}${g.base.toLowerCase()===($('#rcBlackName').value.trim()||'Black').toLowerCase()?`<button class="btn sm" data-torecolor="1" title="Make other colours from this black texture">Recolor</button>`:''}<button class="btn sm ghost" data-delgroup="${esc(JSON.stringify(g.tiles.filter(t=>!t.missing).map(t=>t.name)))}" data-label="${esc(g.base)}" title="Move ${esc(g.base)} and its skin versions to the Recycle Bin"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>Delete</button></div></div>
+      <div class="ghead"><b>${esc(g.base)}</b><div class="right"><span class="meta ${missing?'missing':''}">${missing?`${missing} skin version${missing>1?'s':''} missing`:'Complete'}</span>${missing?`<button class="btn sm primary" data-gen="${esc(JSON.stringify([g.base]))}">Generate missing</button>`:''}${g.base.toLowerCase()===($('#rcBlackName').value.trim()||'Black').toLowerCase()?`<button class="btn sm" data-torecolor="1" title="Make other colours from this black texture">Recolor</button>`:''}${g.tiles[0] && !g.tiles[0].missing ? `<button class="btn sm hover-only" data-rebuild="${esc(g.base)}" title="Remake ${esc(g.base)}Skin1 to Skin6 from the current ${esc(g.base)}.png (old ones go to the Recycle Bin)">Update skins</button>`:''}<button class="btn sm ghost" data-delgroup="${esc(JSON.stringify(g.tiles.filter(t=>!t.missing).map(t=>t.name)))}" data-label="${esc(g.base)}" title="Move ${esc(g.base)} and its skin versions to the Recycle Bin"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>Delete</button></div></div>
       <div class="tiles">${g.tiles.map(tile).join('')}</div></div>`;
   }
   if(others.length){
@@ -531,6 +533,7 @@ async function loadFiles(){
   box.querySelectorAll('[data-delgroup]').forEach(b=>b.onclick=()=>askDelete(JSON.parse(b.dataset.delgroup), `${b.dataset.label} and its skin versions`));
   box.querySelectorAll('[data-del]').forEach(b=>{ b.onclick=e=>{ e.stopPropagation(); askDelete([b.dataset.del], b.dataset.del); }; b.ondblclick=e=>e.stopPropagation(); });
   box.querySelectorAll('[data-torecolor]').forEach(b=>b.onclick=()=>{ setTab('recolor'); autoSource(); $('#pane-recolor').scrollIntoView({behavior:'smooth', block:'start'}); });
+  box.querySelectorAll('[data-rebuild]').forEach(b=>b.onclick=()=>rebuildSkins(b.dataset.rebuild, b));
   box.querySelectorAll('[data-gen]').forEach(b=>b.onclick=()=>generateMissing(JSON.parse(b.dataset.gen), b));
   box.querySelectorAll('.tile[data-n]').forEach(t=>{
     t.onclick = ()=>{ $('#previewCanvas').style.display='none'; $('#previewImg').style.display=''; $('#previewImg').src = thumbUrl(t.dataset.n, t.dataset.m)+'&big=1'; $('#previewCap').textContent=t.dataset.n; $('#preview').classList.add('show'); };
@@ -538,6 +541,17 @@ async function loadFiles(){
   });
 }
 
+async function rebuildSkins(base, btn){
+  btn.disabled = true; btn.style.opacity = 1; btn.textContent = 'Updating...';
+  try{
+    const r = await post('/api/rebuild', {year:st.year, month:st.month, folder:st.folder, names:[base]});
+    st.fresh = new Set(r.results.filter(x=>!x.error).map(x=>x.name));
+    showStatus(r.results.map(x=> x.error ? {cls:'err', k:x.name, v:x.error}
+      : x.warning ? {cls:'warn', k:x.name, v:x.warning}
+      : {cls:'ok', k:x.name, v:`skins remade from ${x.name}.png (${x.created.length} files, old ones are in the Recycle Bin)`}));
+  }catch(e){ showStatus([{cls:'err', k:'Update skins', v:e.message}]); }
+  await loadState();
+}
 async function generateMissing(names, btn){
   btn.disabled = true; btn.textContent = 'Generating...';
   try{
