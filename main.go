@@ -478,6 +478,7 @@ func makeThumb(path string, size int) ([]byte, error) {
 // ---------- http ----------
 
 var lastPing = time.Now()
+var byeAt time.Time // when the window said it was closing
 var pingMu sync.Mutex
 
 func writeJSON(w http.ResponseWriter, v any) {
@@ -506,6 +507,13 @@ func routes() *http.ServeMux {
 		b, _ := uiFS.ReadFile("favicon.png")
 		w.Header().Set("Content-Type", "image/png")
 		w.Write(b)
+	})
+
+	// sent by the window as it closes; we quit shortly after unless it comes back (reload)
+	mux.HandleFunc("/api/bye", func(w http.ResponseWriter, r *http.Request) {
+		pingMu.Lock()
+		byeAt = time.Now()
+		pingMu.Unlock()
 	})
 
 	mux.HandleFunc("/api/ping", func(w http.ResponseWriter, r *http.Request) {
@@ -894,8 +902,11 @@ func main() {
 		for range time.Tick(5 * time.Second) {
 			pingMu.Lock()
 			idle := time.Since(lastPing)
+			closed := !byeAt.IsZero() && lastPing.Before(byeAt) && time.Since(byeAt) > 10*time.Second
 			pingMu.Unlock()
-			if idle > 45*time.Second {
+			// Edge slows timers in background windows to about once a minute,
+			// so only treat silence as "closed" after a long time.
+			if closed || idle > 15*time.Minute {
 				os.Exit(0)
 			}
 		}

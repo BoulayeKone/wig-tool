@@ -398,8 +398,13 @@ const $ = s => document.querySelector(s);
 const st = { settings:null, years:[], year:'', months:[], month:'', folders:[], folder:'', nowYear:'', nowMonth:'', fresh:new Set() };
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
+function lostConnection(){
+  $('#banner').innerHTML = `<div class="banner">The app stopped running in the background. Close this window and open BlayUGC Wig Tool again.</div>`;
+}
 async function api(path, opts){
-  const r = await fetch(path, opts);
+  let r;
+  try{ r = await fetch(path, opts); }
+  catch(e){ lostConnection(); throw new Error('The app stopped running. Close this window and open it again.'); }
   const j = await r.json().catch(()=>({}));
   if(!r.ok) throw new Error(j.error || r.statusText);
   return j;
@@ -409,6 +414,8 @@ const qs = o => new URLSearchParams(o).toString();
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 setInterval(()=>fetch('/api/ping').catch(()=>{}), 4000); fetch('/api/ping');
+window.addEventListener('pagehide', ()=>{ try{ navigator.sendBeacon('/api/bye'); }catch(e){} });
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) fetch('/api/ping').catch(()=>{}); });
 
 async function loadState(){
   const s = await api('/api/state');
