@@ -572,6 +572,28 @@ func routes() *http.ServeMux {
 		writeJSON(w, map[string]any{"path": p, "files": out})
 	})
 
+	// raw PNG from the open folder (used to recolor a Black.png that's already there)
+	mux.HandleFunc("/file", func(w http.ResponseWriter, r *http.Request) {
+		p, err := target(q(r, "year"), q(r, "month"), q(r, "folder"))
+		if err != nil {
+			http.Error(w, err.Error(), 400)
+			return
+		}
+		name, err := cleanName(q(r, "name"))
+		if err != nil || name == "" || !strings.EqualFold(filepath.Ext(name), ".png") {
+			http.Error(w, "bad name", 400)
+			return
+		}
+		b, err := os.ReadFile(filepath.Join(p, name))
+		if err != nil {
+			http.Error(w, "not found", 404)
+			return
+		}
+		w.Header().Set("Content-Type", "image/png")
+		w.Header().Set("Cache-Control", "no-store")
+		w.Write(b)
+	})
+
 	mux.HandleFunc("/thumb", func(w http.ResponseWriter, r *http.Request) {
 		p, err := target(q(r, "year"), q(r, "month"), q(r, "folder"))
 		if err != nil {

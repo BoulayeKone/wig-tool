@@ -181,6 +181,34 @@ header{display:flex;align-items:center;gap:12px;padding:14px 22px;border-bottom:
 .cw-live p{margin:0;color:var(--faint);font-size:12.5px;max-width:260px}
 .rc .x{border:0;background:transparent;color:var(--faint);padding:0 2px;font-size:15px;line-height:1}
 .rc .x:hover{color:#ffb4b4}
+
+.step{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.step-h{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.step-h .num{width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-size:12px;font-weight:700;flex:none}
+.step-h b{font-weight:600}
+.step-h .sub{color:var(--faint);font-size:12.5px}
+#dropRc.over{border-color:var(--accent);background:#211b17}
+.busy{opacity:.7;pointer-events:none}
+.src{display:flex;align-items:center;gap:16px}
+.src-thumb{width:84px;height:84px;border-radius:9px;border:1.5px dashed var(--line2);overflow:hidden;flex:none;
+  background-color:#5d5d63;background-image:linear-gradient(45deg,#535359 25%,transparent 25%,transparent 75%,#535359 75%),linear-gradient(45deg,#535359 25%,transparent 25%,transparent 75%,#535359 75%);background-size:10px 10px;background-position:0 0,5px 5px}
+.src-thumb.empty{background:var(--bg)}
+.src-thumb canvas{width:100%;height:100%;display:block}
+.src-txt{flex:1;min-width:0}
+.src-txt b{display:block;margin-bottom:3px}
+.src-txt span{color:var(--muted);font-size:13px}
+.cw-live{display:flex;flex-direction:column;gap:8px;align-items:center;width:200px}
+.cw-live canvas{width:200px;height:200px;border-radius:10px;border:1px solid var(--line);display:block;
+  background-color:#5d5d63;background-image:linear-gradient(45deg,#535359 25%,transparent 25%,transparent 75%,#535359 75%),linear-gradient(45deg,#535359 25%,transparent 25%,transparent 75%,#535359 75%);background-size:14px 14px;background-position:0 0,7px 7px}
+.cw-live p{margin:0;color:var(--faint);font-size:12.5px;text-align:center;width:200px;height:200px;border:1px dashed var(--line2);border-radius:10px;display:grid;place-items:center;padding:16px;box-sizing:border-box}
+.cw-bright{display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--faint)}
+.cw-steps{margin:0;padding-left:18px;color:var(--muted);font-size:12.5px;line-height:1.6}
+.cw-row .sw{width:32px;height:32px;border-radius:7px;border:1px solid rgba(255,255,255,.1);flex:none}
+.cw-row.wrapb{flex-wrap:wrap}
+.cw-help{margin:0;color:var(--faint);font-size:12px}
+.cw-help b{color:var(--muted);font-weight:600}
+.prev-empty{color:var(--faint);font-size:13px;border:1px dashed var(--line2);border-radius:10px;padding:26px;text-align:center}
+#rcPrev .rc-opts{margin-top:14px}
 .confirm-list{color:var(--muted);font-size:13px;max-height:160px;overflow:auto;margin:0;padding-left:18px}
 .others .tiles{grid-template-columns:repeat(auto-fill,minmax(110px,1fr))}
 
@@ -268,47 +296,55 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
       </div>
       </div>
       <div class="pane" id="pane-recolor">
-        <div class="drop" id="dropRc">
-          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 15V4m0 0-4 4m4-4 4 4M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3"/></svg></div>
-          <div class="txt">
-            <b>Drop your black texture here</b>
-            <span id="rcHint">Exported from Photoshop with no background. You'll see a preview of every ticked colour before anything is saved.</span>
+        <section class="step" id="dropRc">
+          <div class="step-h"><span class="num">1</span><b>Black texture</b><span class="sub">The black texture you exported from Photoshop, with no background.</span></div>
+          <div class="src">
+            <div class="src-thumb" id="srcThumbBox"><canvas id="srcThumb"></canvas></div>
+            <div class="src-txt"><b id="srcTitle">No black texture yet</b><span id="srcSub">Drop it anywhere on this page, or choose the file.</span></div>
+            <button class="btn primary" id="pickRc">Choose file</button>
+            <input type="file" id="fileInputRc" accept=".png,image/png" hidden>
           </div>
-          <button class="btn primary" id="pickRc">Choose file</button>
-          <input type="file" id="fileInputRc" accept=".png,image/png" hidden>
-        </div>
-        <div class="rc-box">
-          <div class="rc-head"><b>Colours to make</b><div class="hdr-right"><button class="mini" id="rcAll">Select all</button><button class="mini" id="rcNone">None</button></div></div>
+        </section>
+
+        <section class="step">
+          <div class="step-h"><span class="num">2</span><b>Pick the colours</b><span class="sub">Tick your presets, or make a new colour on the wheel.</span>
+            <div class="hdr-right" style="margin-left:auto"><button class="mini" id="rcAll">Select all</button><button class="mini" id="rcNone">None</button></div></div>
           <div class="rc-grid" id="rcGrid"></div>
+
           <div class="cw">
             <div class="cw-wheel">
               <div class="wrap" id="cwWrap"><canvas id="cwCanvas" width="360" height="360"></canvas><div class="cw-dot" id="cwDot"></div></div>
-              <input type="range" id="cwVal" min="0" max="100" value="80" title="Brightness">
+              <label class="cw-bright">Brightness<input type="range" id="cwVal" min="0" max="100" value="80"></label>
+            </div>
+            <div class="cw-live">
+              <canvas id="cwPrev"></canvas>
+              <p id="cwNote">Add your black texture in step 1 to see the colour on it here.</p>
             </div>
             <div class="cw-side">
-              <div class="lbl">Custom colour · Linear Dodge (Add)</div>
-              <div class="cw-row"><input type="text" class="hex" id="cwHex" spellcheck="false" maxlength="7"><input type="text" class="nm" id="cwName" placeholder="Name, e.g. Purple" spellcheck="false"></div>
-              <div class="cw-live"><div class="sw" id="cwSwatch"></div><canvas id="cwPrev"></canvas><p id="cwNote">Drop a black texture above to see this colour on it live.</p></div>
-              <div class="cw-row"><button class="btn sm primary" id="cwAdd">Add to this batch</button><button class="btn sm" id="cwPreset">Save as preset</button></div>
+              <div class="lbl">Make your own colour</div>
+              <ol class="cw-steps"><li>Click the wheel or type a hex code</li><li>Check how it looks on the left</li><li>Name it and add it</li></ol>
+              <div class="cw-row"><span class="sw" id="cwSwatch"></span><input type="text" class="hex" id="cwHex" spellcheck="false" maxlength="7" title="Hex code"></div>
+              <div class="cw-row"><input type="text" class="nm" id="cwName" placeholder="Name, e.g. Green" spellcheck="false"></div>
+              <div class="cw-row wrapb"><button class="btn sm primary" id="cwAdd">Add to colours</button><button class="btn sm" id="cwPreset">Save as preset</button></div>
+              <p class="cw-help"><b>Add to colours</b> uses it this time only. <b>Save as preset</b> keeps it in your list for next time.</p>
             </div>
           </div>
+        </section>
+
+        <section class="step" id="rcPrev">
+          <div class="step-h"><span class="num">3</span><b>Preview and generate</b><span class="sub" id="rcPrevFile">Nothing is saved until you click Generate.</span>
+            <div class="bg-pick" id="rcBgPick" style="margin-left:auto"></div></div>
+          <div class="prev-grid" id="rcPrevGrid"></div>
+          <div class="prev-empty" id="rcPrevEmpty">Add your black texture in step 1 to see every colour here.</div>
           <div class="rc-opts">
             <label class="check"><input type="checkbox" id="rcKeepBlack" checked><span>Also save the black texture as</span><input type="text" id="rcBlackName" value="Black" spellcheck="false"><span>.png</span></label>
             <label class="check"><input type="checkbox" id="rcSkins" checked><span>Make the 6 skin versions for every colour</span></label>
           </div>
-        </div>
-        <div class="rc-prev" id="rcPrev">
-          <div class="rc-prev-head">
-            <b>Preview</b><span class="file" id="rcPrevFile"></span>
-            <div class="bg-pick" id="rcBgPick"></div>
-          </div>
-          <div class="prev-grid" id="rcPrevGrid"></div>
           <div class="prev-foot">
             <span id="rcPrevNote"></span>
-            <button class="btn" id="rcCancel">Cancel</button>
-            <button class="btn primary" id="rcSave">Save</button>
+            <button class="btn primary" id="rcSave" disabled>Generate</button>
           </div>
-        </div>
+        </section>
       </div>
       <div class="status" id="status"></div>
       <div id="files"></div>
@@ -452,6 +488,7 @@ function suggestFolderName(){
 const thumbUrl = (name, mod) => '/thumb?'+qs({year:st.year, month:st.month, folder:st.folder, name, v:mod});
 
 async function loadFiles(){
+  autoSource();
   renderCrumbs();
   const box = $('#files');
   if(!st.month){ box.innerHTML = `<div class="placeholder"><b>Pick a month</b>Choose where the textures should go on the left.</div>`; return; }
@@ -484,7 +521,7 @@ async function loadFiles(){
   for(const g of groups){
     const missing = g.tiles.filter(t=>t.missing).length;
     html += `<div class="group ${st.fresh.has(g.base)?'fresh':''}">
-      <div class="ghead"><b>${esc(g.base)}</b><div class="right"><span class="meta ${missing?'missing':''}">${missing?`${missing} skin version${missing>1?'s':''} missing`:'Complete'}</span>${missing?`<button class="btn sm primary" data-gen="${esc(JSON.stringify([g.base]))}">Generate missing</button>`:''}<button class="btn sm ghost" data-delgroup="${esc(JSON.stringify(g.tiles.filter(t=>!t.missing).map(t=>t.name)))}" data-label="${esc(g.base)}" title="Move ${esc(g.base)} and its skin versions to the Recycle Bin"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>Delete</button></div></div>
+      <div class="ghead"><b>${esc(g.base)}</b><div class="right"><span class="meta ${missing?'missing':''}">${missing?`${missing} skin version${missing>1?'s':''} missing`:'Complete'}</span>${missing?`<button class="btn sm primary" data-gen="${esc(JSON.stringify([g.base]))}">Generate missing</button>`:''}${g.base.toLowerCase()===($('#rcBlackName').value.trim()||'Black').toLowerCase()?`<button class="btn sm" data-torecolor="1" title="Make other colours from this black texture">Recolor</button>`:''}<button class="btn sm ghost" data-delgroup="${esc(JSON.stringify(g.tiles.filter(t=>!t.missing).map(t=>t.name)))}" data-label="${esc(g.base)}" title="Move ${esc(g.base)} and its skin versions to the Recycle Bin"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>Delete</button></div></div>
       <div class="tiles">${g.tiles.map(tile).join('')}</div></div>`;
   }
   if(others.length){
@@ -493,6 +530,7 @@ async function loadFiles(){
   box.innerHTML = html;
   box.querySelectorAll('[data-delgroup]').forEach(b=>b.onclick=()=>askDelete(JSON.parse(b.dataset.delgroup), `${b.dataset.label} and its skin versions`));
   box.querySelectorAll('[data-del]').forEach(b=>{ b.onclick=e=>{ e.stopPropagation(); askDelete([b.dataset.del], b.dataset.del); }; b.ondblclick=e=>e.stopPropagation(); });
+  box.querySelectorAll('[data-torecolor]').forEach(b=>b.onclick=()=>{ setTab('recolor'); autoSource(); $('#pane-recolor').scrollIntoView({behavior:'smooth', block:'start'}); });
   box.querySelectorAll('[data-gen]').forEach(b=>b.onclick=()=>generateMissing(JSON.parse(b.dataset.gen), b));
   box.querySelectorAll('.tile[data-n]').forEach(t=>{
     t.onclick = ()=>{ $('#previewCanvas').style.display='none'; $('#previewImg').style.display=''; $('#previewImg').src = thumbUrl(t.dataset.n, t.dataset.m)+'&big=1'; $('#previewCap').textContent=t.dataset.n; $('#preview').classList.add('show'); };
@@ -686,9 +724,8 @@ try{
   if(o.blackName) $('#rcBlackName').value = o.blackName;
 }catch(e){}
 function saveRcOpts(){ try{ localStorage.setItem('rcOpts', JSON.stringify({keep:$('#rcKeepBlack').checked, skins:$('#rcSkins').checked, blackName:$('#rcBlackName').value})); }catch(e){} }
-['#rcKeepBlack','#rcSkins','#rcBlackName'].forEach(id=>$(id).onchange=()=>{ saveRcOpts(); renderRcPreview(); });
+['#rcKeepBlack','#rcSkins','#rcBlackName'].forEach(id=>$(id).onchange=()=>{ saveRcOpts(); if(id==='#rcBlackName') autoSource(); renderRcPreview(); });
 
-const RC_HINT = 'Exported from Photoshop with no background. You\'ll see a preview of every ticked colour before anything is saved.';
 async function recolorFile(list){
   const pngs = [...list].filter(f=>/\.png$/i.test(f.name));
   if(pngs.length !== 1){ showStatus([{cls:'err', k:'Recolor', v:'Drop one black .png texture at a time.'}]); return; }
@@ -705,10 +742,9 @@ async function recolorFile(list){
   fd.append('blackName', $('#rcBlackName').value.trim() || 'Black');
   fd.append('skins', $('#rcSkins').checked?'1':'0');
   fd.append('file', pngs[0], pngs[0].name);
-  const dz = $('#dropRc');
+  const dz = $('#pane-recolor');
   dz.classList.add('busy');
-  const n = colors.length + customs.length + (keep?1:0);
-  $('#rcHint').textContent = `Making ${n} colour${n===1?'':'s'}${$('#rcSkins').checked?' with skin versions':''}... this can take a few seconds.`;
+  $('#rcSave').textContent = 'Generating... this takes a few seconds';
   try{
     const r = await api('/api/recolor', {method:'POST', body:fd});
     st.fresh = new Set(r.results.filter(x=>!x.error).map(x=>x.name));
@@ -716,11 +752,12 @@ async function recolorFile(list){
     const lines = r.results.filter(x=>x.error||x.warning).map(x=>({cls:x.error?'err':'warn', k:x.name, v:x.error||x.warning}));
     lines.unshift({cls:'ok', k:'Recolor done', v:`${r.results.length - lines.length} colour${r.results.length===1?'':'s'}, ${total} files saved`});
     showStatus(lines);
-    clearRcPreview();
     st.customs = [];
+    renderRecolors();
     await loadState();
+    $('#status').scrollIntoView({behavior:'smooth', block:'nearest'});
   }catch(e){ showStatus([{cls:'err', k:'Recolor', v:e.message}]); }
-  finally{ dz.classList.remove('busy'); $('#rcHint').textContent = RC_HINT; }
+  finally{ dz.classList.remove('busy'); renderRcPreview(); }
 }
 $('#pickRc').onclick = ()=>$('#fileInputRc').click();
 $('#fileInputRc').onchange = e=>{ loadRcPreview(e.target.files); e.target.value=''; };
@@ -784,21 +821,40 @@ function previewItems(){
   (st.customs||[]).forEach(p=>items.push({name:p.name, preset:p}));
   return items;
 }
-async function loadRcPreview(list){
+async function loadRcPreview(list, fromFolder){
   const pngs = [...list].filter(f=>/\.png$/i.test(f.name));
   if(pngs.length !== 1){ showStatus([{cls:'err', k:'Recolor', v:'Drop one black .png texture at a time.'}]); return; }
-  try{
-    const bmp = await createImageBitmap(pngs[0]);
-    rcPrev.file = pngs[0]; rcPrev.bitmap = bmp; rcPrev.small = scaled(bmp, 220);
-  }catch(e){ showStatus([{cls:'err', k:'Recolor', v:'Could not read this PNG.'}]); return; }
+  let bmp;
+  try{ bmp = await createImageBitmap(pngs[0]); }
+  catch(e){ if(!fromFolder) showStatus([{cls:'err', k:'Recolor', v:'Could not read this PNG.'}]); return; }
+  rcPrev.file = pngs[0]; rcPrev.bitmap = bmp; rcPrev.small = scaled(bmp, 220); rcPrev.fromFolder = !!fromFolder;
   const a = rcPrev.small.data; let transparent=false;
   for(let i=3;i<a.length;i+=4){ if(a[i]<250){ transparent=true; break; } }
-  $('#rcPrevFile').textContent = rcPrev.file.name + (transparent ? '' : ' — warning: no transparent background');
-  $('#status').classList.remove('show');
-  $('#rcPrev').classList.add('show');
+  $('#srcThumbBox').classList.remove('empty');
+  drawInto($('#srcThumb'), rcPrev.small, null);
+  $('#srcTitle').textContent = rcPrev.file.name;
+  $('#srcSub').textContent = !transparent ? 'Warning: this file has no transparent background.'
+    : fromFolder ? `Found in ${st.folder||st.month}. Drop another file to use that one instead.` : 'Ready. Drop another file to replace it.';
+  $('#pickRc').textContent = 'Change file';
+  if(!fromFolder) $('#status').classList.remove('show');
   renderBgPick();
   renderRcPreview();
-  $('#rcPrev').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+// Use the black texture that's already in the open folder, unless one was dropped by hand.
+async function autoSource(){
+  if(rcPrev.file && !rcPrev.fromFolder) return;
+  const name = ($('#rcBlackName').value.trim()||'Black') + '.png';
+  const key = [st.year, st.month, st.folder, name].join('/');
+  if(rcPrev.autoKey === key && rcPrev.file) return;
+  rcPrev.autoKey = key;
+  clearRcPreview();
+  if(!st.month) return;
+  try{
+    const r = await fetch('/file?'+qs({year:st.year, month:st.month, folder:st.folder, name}));
+    if(!r.ok || rcPrev.autoKey !== key) return;
+    const blob = await r.blob();
+    await loadRcPreview([new File([blob], name, {type:'image/png'})], true);
+  }catch(e){}
 }
 function renderBgPick(){
   const skins = st.settings.skins;
@@ -809,8 +865,12 @@ function renderBgPick(){
 }
 function renderRcPreview(){
   if(typeof cwChanged==='function') cwChanged(true);
-  if(!rcPrev.small) return;
   const items = previewItems();
+  $('#rcPrevEmpty').style.display = rcPrev.small ? 'none' : '';
+  if(!rcPrev.small){
+    $('#rcPrevGrid').innerHTML=''; $('#rcSave').disabled = true; $('#rcSave').textContent='Generate';
+    $('#rcPrevNote').textContent = ''; return;
+  }
   const bg = rcPrev.bg>=0 ? st.settings.skins[rcPrev.bg] : null;
   const grid = $('#rcPrevGrid'); grid.innerHTML='';
   items.forEach(it=>{
@@ -824,7 +884,7 @@ function renderRcPreview(){
   const skins = $('#rcSkins').checked;
   const files = items.length * (skins?7:1);
   $('#rcPrevNote').textContent = items.length ? `${items.length} colour${items.length===1?'':'s'} · ${files} files will be saved to ${st.folder||st.month}` : 'Tick at least one colour.';
-  $('#rcSave').textContent = items.length ? `Save ${items.length} colour${items.length===1?'':'s'}` : 'Save';
+  $('#rcSave').textContent = items.length ? `Generate ${items.length} colour${items.length===1?'':'s'}` : 'Generate';
   $('#rcSave').disabled = !items.length;
 }
 function bigPreview(it, bg){
@@ -835,11 +895,14 @@ function bigPreview(it, bg){
   $('#preview').classList.add('show');
 }
 function clearRcPreview(){
-  rcPrev.file=null; rcPrev.bitmap=null; rcPrev.small=null;
-  $('#rcPrev').classList.remove('show'); $('#rcPrevGrid').innerHTML='';
-  cwChanged(true);
+  rcPrev.file=null; rcPrev.bitmap=null; rcPrev.small=null; rcPrev.fromFolder=false;
+  $('#srcThumbBox').classList.add('empty');
+  const c=$('#srcThumb'); c.getContext('2d').clearRect(0,0,c.width,c.height);
+  $('#srcTitle').textContent = 'No black texture in this folder yet';
+  $('#srcSub').textContent = 'Drop it anywhere on this page, or choose the file.';
+  $('#pickRc').textContent = 'Choose file';
+  renderRcPreview();
 }
-$('#rcCancel').onclick = clearRcPreview;
 $('#rcSave').onclick = ()=>{ if(rcPrev.file) recolorFile([rcPrev.file]); };
 
 /* colour wheel (custom Linear Dodge colours) */
@@ -887,7 +950,7 @@ function cwChanged(fromHex){
       const bg = rcPrev.bg>=0 ? st.settings.skins[rcPrev.bg] : null;
       drawInto($('#cwPrev'), applyRecolor(rcPrev.small, {hex, mode:'add'}), bg);
       $('#cwPrev').style.display=''; $('#cwNote').style.display='none';
-    } else { $('#cwPrev').style.display='none'; $('#cwNote').style.display=''; }
+    } else { $('#cwPrev').style.display='none'; $('#cwNote').style.display='grid'; }
   });
 }
 (function(){
@@ -911,7 +974,7 @@ function cwChanged(fromHex){
 function customFromInputs(){
   const hex = toHex(hsv2rgb(cw.h,cw.s,cw.v));
   const name = $('#cwName').value.trim().replace(/\s+/g,'');
-  if(!name){ showStatus([{cls:'err', k:'Custom colour', v:'Give it a name first (it becomes the file name, e.g. Purple.png).'}]); $('#cwName').focus(); return null; }
+  if(!name){ showStatus([{cls:'err', k:'Custom colour', v:'Give it a name first. It becomes the file name, e.g. Green.png.'}]); $('#cwName').focus(); return null; }
   if(!/^[A-Za-z0-9_\-]+$/.test(name)){ showStatus([{cls:'err', k:'Custom colour', v:'Use only letters, numbers, - and _ in the name.'}]); return null; }
   const taken = [...(st.settings.recolors||[]), ...st.customs].some(r=>r.name.toLowerCase()===name.toLowerCase()) || name.toLowerCase()===($('#rcBlackName').value.trim()||'Black').toLowerCase();
   if(taken){ showStatus([{cls:'err', k:'Custom colour', v:`"${name}" is already used. Pick another name.`}]); return null; }
