@@ -17,6 +17,8 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: "1.24"
+      - name: Embed app icon
+        run: go run github.com/tc-hib/go-winres@latest simply --icon winres/icon.png --manifest gui --product-name "BlayUGC Wig Tool" --file-description "BlayUGC Wig Tool"
       - name: Build
         run: |
           VERSION="${GITHUB_REF_NAME#v}"

@@ -26,7 +26,7 @@ import (
 	"time"
 )
 
-//go:embed ui.html
+//go:embed ui.html favicon.png
 var uiFS embed.FS
 
 const (
@@ -467,6 +467,12 @@ func routes() *http.ServeMux {
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		b, _ := uiFS.ReadFile("ui.html")
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		w.Write(b)
+	})
+
+	mux.HandleFunc("/favicon.png", func(w http.ResponseWriter, r *http.Request) {
+		b, _ := uiFS.ReadFile("favicon.png")
+		w.Header().Set("Content-Type", "image/png")
 		w.Write(b)
 	})
 
