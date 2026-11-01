@@ -13,3 +13,12 @@ func openExplorer(dir, selectFile string) error { fmt.Println("explorer", dir, s
 func showError(msg string)                      { fmt.Fprintln(os.Stderr, msg) }
 func hidden(cmd *exec.Cmd) *exec.Cmd            { return cmd }
 func brandWindows()                             {}
+
+func recycle(paths []string) error {
+	for _, p := range paths {
+		if err := os.Remove(p); err != nil {
+			return err
+		}
+	}
+	return nil
+}

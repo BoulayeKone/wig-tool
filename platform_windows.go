@@ -3,6 +3,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -52,4 +53,39 @@ func showError(msg string) {
 	t, _ := syscall.UTF16PtrFromString(appName)
 	m, _ := syscall.UTF16PtrFromString(msg)
 	box.Call(0, uintptr(unsafe.Pointer(m)), uintptr(unsafe.Pointer(t)), 0x10)
+}
+
+// recycle moves files to the Recycle Bin (recoverable), not a permanent delete.
+func recycle(paths []string) error {
+	var from []uint16
+	for _, p := range paths {
+		u, err := syscall.UTF16FromString(p)
+		if err != nil {
+			return err
+		}
+		from = append(from, u...) // includes the terminating 0
+	}
+	from = append(from, 0) // list ends with a double 0
+	op := struct {
+		hwnd                  uintptr
+		wFunc                 uint32
+		pFrom                 *uint16
+		pTo                   *uint16
+		fFlags                uint16
+		fAnyOperationsAborted int32
+		hNameMappings         uintptr
+		lpszProgressTitle     *uint16
+	}{
+		wFunc:  3, // FO_DELETE
+		pFrom:  &from[0],
+		fFlags: 0x40 | 0x10 | 0x4 | 0x400, // ALLOWUNDO | NOCONFIRMATION | SILENT | NOERRORUI
+	}
+	r, _, _ := syscall.NewLazyDLL("shell32.dll").NewProc("SHFileOperationW").Call(uintptr(unsafe.Pointer(&op)))
+	if r != 0 {
+		return fmt.Errorf("could not move to Recycle Bin (code %d)", r)
+	}
+	if op.fAnyOperationsAborted != 0 {
+		return fmt.Errorf("delete was cancelled")
+	}
+	return nil
 }

@@ -102,6 +102,17 @@ header{display:flex;align-items:center;gap:12px;padding:14px 22px;border-bottom:
 .tile small{font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tile:hover small{color:var(--text)}
 .tile:hover .img{border-color:var(--line2)}
+.tile{cursor:pointer}
+.tile .img{position:relative}
+.tile .del{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:7px;border:1px solid rgba(255,255,255,.12);background:rgba(20,20,22,.82);color:var(--text);display:grid;place-items:center;opacity:0;transition:opacity .12s}
+.tile .del svg{width:14px;height:14px}
+.tile:hover .del{opacity:1}
+.tile .del:hover{background:#4a2020;border-color:#7a3535;color:#ffd6d6}
+.btn.ghost{background:transparent;border-color:var(--line2);color:var(--muted)}
+.btn.ghost:hover{color:#ffb4b4;border-color:#7a3535}
+.btn.danger{background:#b84a4a;border-color:#b84a4a;color:#fff;font-weight:600}
+.btn.danger:hover{filter:brightness(1.08)}
+.confirm-list{color:var(--muted);font-size:13px;max-height:160px;overflow:auto;margin:0;padding-left:18px}
 .others .tiles{grid-template-columns:repeat(auto-fill,minmax(110px,1fr))}
 
 .placeholder{color:var(--muted);text-align:center;padding:60px 20px}
@@ -186,6 +197,18 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
     </div>
   </main>
 </div>
+
+<dialog id="confirmDlg">
+  <div class="dlg-h" id="confirmTitle">Delete</div>
+  <div class="dlg-b">
+    <div>These files will be moved to the Recycle Bin. You can restore them from there.</div>
+    <ul class="confirm-list" id="confirmList"></ul>
+  </div>
+  <div class="dlg-f">
+    <button class="btn" id="confirmNo">Cancel</button>
+    <button class="btn danger" id="confirmYes">Move to Recycle Bin</button>
+  </div>
+</dialog>
 
 <dialog id="settingsDlg">
   <div class="dlg-h">Settings</div>
@@ -337,13 +360,15 @@ async function loadFiles(){
   for(const g of groups){
     const missing = g.tiles.filter(t=>t.missing).length;
     html += `<div class="group ${st.fresh.has(g.base)?'fresh':''}">
-      <div class="ghead"><b>${esc(g.base)}</b><div class="right"><span class="meta ${missing?'missing':''}">${missing?`${missing} skin version${missing>1?'s':''} missing`:'Complete'}</span>${missing?`<button class="btn sm primary" data-gen="${esc(JSON.stringify([g.base]))}">Generate missing</button>`:''}</div></div>
+      <div class="ghead"><b>${esc(g.base)}</b><div class="right"><span class="meta ${missing?'missing':''}">${missing?`${missing} skin version${missing>1?'s':''} missing`:'Complete'}</span>${missing?`<button class="btn sm primary" data-gen="${esc(JSON.stringify([g.base]))}">Generate missing</button>`:''}<button class="btn sm ghost" data-delgroup="${esc(JSON.stringify(g.tiles.filter(t=>!t.missing).map(t=>t.name)))}" data-label="${esc(g.base)}" title="Move ${esc(g.base)} and its skin versions to the Recycle Bin"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>Delete</button></div></div>
       <div class="tiles">${g.tiles.map(tile).join('')}</div></div>`;
   }
   if(others.length){
     html += `<div class="group others"><div class="ghead"><b>Other files</b><span class="meta">${others.length}</span></div><div class="tiles">${others.map(tile).join('')}</div></div>`;
   }
   box.innerHTML = html;
+  box.querySelectorAll('[data-delgroup]').forEach(b=>b.onclick=()=>askDelete(JSON.parse(b.dataset.delgroup), `${b.dataset.label} and its skin versions`));
+  box.querySelectorAll('[data-del]').forEach(b=>{ b.onclick=e=>{ e.stopPropagation(); askDelete([b.dataset.del], b.dataset.del); }; b.ondblclick=e=>e.stopPropagation(); });
   box.querySelectorAll('[data-gen]').forEach(b=>b.onclick=()=>generateMissing(JSON.parse(b.dataset.gen), b));
   box.querySelectorAll('.tile[data-n]').forEach(t=>{
     t.onclick = ()=>{ $('#previewImg').src = thumbUrl(t.dataset.n, t.dataset.m)+'&big=1'; $('#previewCap').textContent=t.dataset.n; $('#preview').classList.add('show'); };
@@ -367,9 +392,31 @@ async function generateMissing(names, btn){
 
 function tile(f){
   if(f.missing) return `<div class="tile"><div class="img none">missing</div><small>${esc(f.missing.replace(/\.png$/i,''))}</small></div>`;
-  return `<button class="tile" data-n="${esc(f.name)}" data-m="${f.mod}" title="Click to preview, double-click to show in Explorer"><div class="img"><img loading="lazy" src="${thumbUrl(f.name,f.mod)}" alt=""></div><small>${esc(f.name.replace(/\.png$/i,''))}</small></button>`;
+  return `<div class="tile" data-n="${esc(f.name)}" data-m="${f.mod}" title="Click to preview, double-click to show in Explorer"><div class="img"><img loading="lazy" src="${thumbUrl(f.name,f.mod)}" alt=""><button class="del" data-del="${esc(f.name)}" title="Move to Recycle Bin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg></button></div><small>${esc(f.name.replace(/\.png$/i,''))}</small></div>`;
 }
 $('#preview').onclick = ()=>$('#preview').classList.remove('show');
+
+let pendingDelete = null;
+function askDelete(names, label){
+  if(!names.length) return;
+  pendingDelete = names;
+  $('#confirmTitle').textContent = `Delete ${label}?`;
+  $('#confirmList').innerHTML = names.map(n=>`<li>${esc(n)}</li>`).join('');
+  $('#confirmDlg').showModal();
+}
+$('#confirmNo').onclick = ()=>{ pendingDelete=null; $('#confirmDlg').close(); };
+$('#confirmYes').onclick = async ()=>{
+  const names = pendingDelete; pendingDelete = null;
+  $('#confirmDlg').close();
+  if(!names) return;
+  try{
+    const r = await post('/api/delete', {year:st.year, month:st.month, folder:st.folder, names});
+    const lines = [{cls:'ok', k:'Deleted', v:`${r.deleted.length} file${r.deleted.length===1?'':'s'} moved to the Recycle Bin`}];
+    if(r.failed.length) lines.push({cls:'err', k:'Not deleted', v:r.failed.join(', ')});
+    showStatus(lines);
+  }catch(e){ showStatus([{cls:'err', k:'Delete', v:e.message}]); }
+  await loadState();
+};
 
 /* processing */
 async function processFiles(list){

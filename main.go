@@ -673,6 +673,50 @@ func routes() *http.ServeMux {
 		writeJSON(w, map[string]any{"path": dir, "results": results})
 	})
 
+	mux.HandleFunc("/api/delete", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "POST only", 405)
+			return
+		}
+		var body struct {
+			Year, Month, Folder string
+			Names               []string
+		}
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			fail(w, err)
+			return
+		}
+		if body.Year == "" || body.Month == "" {
+			fail(w, errors.New("no folder selected"))
+			return
+		}
+		dir, err := target(body.Year, body.Month, body.Folder)
+		if err != nil {
+			fail(w, err)
+			return
+		}
+		deleted, failed := []string{}, []string{}
+		for _, n := range body.Names {
+			name, err := cleanName(n)
+			if err != nil || name == "" || !strings.EqualFold(filepath.Ext(name), ".png") {
+				failed = append(failed, n)
+				continue
+			}
+			p := filepath.Join(dir, name)
+			if info, err := os.Stat(p); err != nil || info.IsDir() {
+				failed = append(failed, n)
+				continue
+			}
+			// one at a time so a single failure doesn't block the rest
+			if err := recycle([]string{p}); err != nil {
+				failed = append(failed, n+" ("+err.Error()+")")
+				continue
+			}
+			deleted = append(deleted, name)
+		}
+		writeJSON(w, map[string]any{"deleted": deleted, "failed": failed})
+	})
+
 	mux.HandleFunc("/api/settings", func(w http.ResponseWriter, r *http.Request) {
 		var s Settings
 		if err := json.NewDecoder(r.Body).Decode(&s); err != nil {
